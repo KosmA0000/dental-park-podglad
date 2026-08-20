@@ -141,16 +141,38 @@ const POMIAR_ID = [
       '<button type="button" class="zgoda-pasek__nie" data-zgoda="nie">Nie licz mnie</button>' +
       "</div>";
 
+    /* Pasek lezy na tresci (`position: fixed`), wiec strona musi oddac
+       mu tyle miejsca u dolu, ile on zajmuje — inaczej przyciski pod
+       nim widac, ale nie da sie w nie trafic. Wysokosc mierzymy, bo
+       zalezy od szerokosci okna: na telefonie pasek lamie sie na kilka
+       wierszy. */
+    const zmierz = () => {
+      document.documentElement.style.setProperty(
+        "--zgoda-wysokosc", pasek.offsetHeight + "px");
+    };
+    const posprzataj = () => {
+      pasek.remove();
+      document.documentElement.classList.remove("zgoda-widoczna");
+      document.documentElement.style.removeProperty("--zgoda-wysokosc");
+      window.removeEventListener("resize", zmierz);
+    };
+
     pasek.addEventListener("click", (e) => {
       const btn = e.target.closest("[data-zgoda]");
       if (!btn) return;
       const tak = btn.dataset.zgoda === "tak";
       zapamietaj(tak);
-      pasek.remove();
+      posprzataj();
       if (tak) wlaczPomiar();
     });
 
     document.body.appendChild(pasek);
+
+    /* Dopiero teraz — przed wstawieniem do dokumentu `offsetHeight`
+       jest zerem, a strona oddalaby paskowi zero miejsca. */
+    document.documentElement.classList.add("zgoda-widoczna");
+    zmierz();
+    window.addEventListener("resize", zmierz);
   }
 
   const odpowiedz = pamietana();

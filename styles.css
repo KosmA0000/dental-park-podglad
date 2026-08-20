@@ -288,6 +288,11 @@ section[id], [id] { scroll-margin-top: 5.5rem; }
 .masthead--zwarty .nav a:hover,
 .masthead--zwarty .nav a[aria-current] { color: var(--deep); }
 .nav a > span { display: inline-block; }
+/* Pozycja menu nie moze sie zlamac na dwa wiersze. Gdy „O nas” pekalo na
+   „O” i „nas”, link rosl z 19 do 39 px — a wtedy `overflow: hidden`
+   przestawalo obcinac kopie napisu, ktora czeka pod spodem na najechanie,
+   i cale menu wygladalo na podwojone. */
+.nav a { white-space: nowrap; }
 .masthead__aside { display: flex; align-items: center; gap: 1.5rem; }
 .masthead__tel {
   display: none;
@@ -1437,6 +1442,13 @@ body:has(.karuzela--z-panelem) .lekarze > .lekarz--widoczny { display: block; }
    Pokazuje się tylko wtedy, gdy licznik jest włączony (czyli gdy w pliku
    analityka.js wpisano identyfikator) i tylko do pierwszej odpowiedzi.
    Stoi nad paskiem akcji na telefonie, żeby go nie zasłaniać. */
+/* Dopoki pasek zgody stoi na ekranie, oddajemy stronie tyle miejsca
+   u dolu, ile pasek zajmuje. Bez tego lezy on na tresci: przycisk pod
+   nim daje sie zobaczyc, ale nie da sie w niego trafic — klikniecie
+   trafia w pasek i wyglada na martwe. */
+html.zgoda-widoczna #smooth-content { padding-bottom: var(--zgoda-wysokosc, 7rem); }
+html.zgoda-widoczna .pasek-akcji { bottom: var(--zgoda-wysokosc, 7rem); }
+
 .zgoda-pasek {
   position: fixed;
   left: 0;

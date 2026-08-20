@@ -466,3 +466,11 @@
 }
 .konto-blad[hidden], .konto-juz[hidden] { display: none; }
 .pole-wskazowka b { color: var(--deep); font-weight: 500; }
+
+/* Strona logowania ma jedno zadanie: wpuscic. Odstepy naglowka sa tu
+   mniejsze niz na stronach do czytania, zeby przycisk „Zaloguj sie”
+   miescil sie w pierwszym ekranie i nie trzeba bylo go szukac. */
+.konto-uwaga { margin-bottom: 1.75rem; }
+.konto-karta > p:first-of-type { margin-bottom: 1.25rem; }
+.konto-karta .field { margin-bottom: 1.15rem; }
+.konto-karta .pole-wskazowka { margin: -0.75rem 0 1.15rem; }
