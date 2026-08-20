@@ -395,6 +395,9 @@ html:not(.js-ruch) .polka__opis { height: auto; }
    Strzałki i licznik dokłada ruch.js: bez skryptu nie miałyby czym
    sterować, więc nie ma ich w znacznikach. Poprzednia talia miała je
    wpisane na stałe i nie były podpięte do niczego — klikało się w nic. */
+/* `display: flex` przebija wbudowane `[hidden]`, wiec zakaz trzeba
+   powtorzyc jawnie — inaczej ukrywanie sterowania z ruch.js nie dziala. */
+.karuzela__ster[hidden] { display: none; }
 .karuzela__ster {
   display: flex;
   align-items: center;

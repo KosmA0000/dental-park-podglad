@@ -709,6 +709,14 @@
         const licznik = ster.querySelector(".karuzela__licznik b");
         if (!karty.length) return;
 
+        /* Strzałki mają sens tylko wtedy, gdy jest co przesuwać. Przy
+           szerokim oknie wszystkie kafelki mieszczą się naraz i sterowanie
+           obiecuje ruch, którego nie ma — więc wtedy znika. Na węższym
+           ekranie tor się przewija i strzałki wracają same. */
+        const ocenSter = () => { ster.hidden = tor.scrollWidth <= tor.clientWidth + 1; };
+        ocenSter();
+        new ResizeObserver(ocenSter).observe(tor);
+
         const teraz = () => {
           /* Widoczna jest ta karta, której lewa krawędź jest najbliżej
              lewej krawędzi toru — to samo kryterium, którym `scroll-snap`

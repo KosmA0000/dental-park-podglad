@@ -1726,7 +1726,7 @@ body:has(.karuzela--z-panelem) .lekarze > .lekarz--widoczny { display: block; }
   text-decoration: none;
   transition: background-color .35s var(--ruch-krzywa, ease);
 }
-.ocena__link:hover { background: color-mix(in srgb, var(--deep) 82%, var(--brass)); }
+.ocena__link:hover { background: var(--ink); color: var(--paper); }
 
 /* Kafelek opinii idzie w ślad za kafelkiem oceny: ta sama etykieta
    wersalikami w mosiądzu i ten sam stopień pisma w podpisie. */
@@ -1753,7 +1753,7 @@ body:has(.karuzela--z-panelem) .lekarze > .lekarz--widoczny { display: block; }
   letter-spacing: 0.06em;
   text-decoration: none;
 }
-.opinia figcaption a:hover { background: color-mix(in srgb, var(--deep) 82%, var(--brass)); }
+.opinia figcaption a:hover { background: var(--ink); color: var(--paper); }
 
 /* ---------- przycisk e-mail ----------
    Kopiuje adres i mówi o tym wprost — patrz komentarz w ruch.js. */
