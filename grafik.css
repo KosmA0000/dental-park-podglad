@@ -1,0 +1,366 @@
+/* ============================================================
+   DentalPark — grafik tygodnia
+   Zastępuje kalendarz.css (tabela krzyżowa lekarz × dzień).
+
+   Dzień jest kolumną czasu 8:00–20:00. Dyżur ma w niej wysokość równą
+   swojej długości, więc „9:00–19:00" widać jako dziesięć godzin, a nie
+   jako napis. Dwa dyżury w jednym dniu dzielą kolumnę na pasma.
+
+   Sam ruch (wejście kolumn, podświetlanie po lekarzu, kreska „teraz")
+   siedzi w ruch.js — ten plik nie animuje niczego.
+   ============================================================ */
+
+.grafik {
+  --grafik-od: 8;         /* pierwsza godzina na osi */
+  --grafik-do: 20;        /* ostatnia godzina na osi */
+  --grafik-wys: clamp(17rem, 26vw, 22rem);
+  /* Pas z nazwami dni stoi nad słupami, więc ta sama wartość musi się zgadzać
+     w trzech miejscach: wysokość nagłówka dnia, zapas nad osią godzin i zapas
+     nad kolumną lekarzy. Wpisana trzy razy z palca rozjeżdżała się przy każdej
+     poprawce — stąd jedna zmienna. */
+  --grafik-pas: 1.75rem;
+  /* Układ odniesienia dla podpowiedzi przy dyżurze. Bez tego `.grafik__opis`
+     — pozycjonowany bezwzględnie i liczony WZGLĘDEM `.grafik` — zaczepiał się
+     o pierwszego pozycjonowanego przodka wyżej i lądował kilkaset pikseli
+     nad kalendarzem, zamiast tuż nad słupem dnia. */
+  position: relative;
+  display: grid;
+  /* Odstęp między kolumną lekarzy a kalendarzem. Przy 2,5rem nazwiska
+     dotykały osi godzin i całość czytała się jak jedna tabela wciśnięta
+     w siebie — to są dwie rzeczy obok siebie, nie jedna. */
+  gap: clamp(2rem, 5vw, 4.5rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+@media (min-width: 62rem) {
+  .grafik { grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr); align-items: start; }
+  /* Dopiero tu obie kolumny stoją obok siebie, więc dopiero tu lewa musi
+     odsunąć się o pas nazw dni — wiersz lekarza ma zaczynać się na tej samej
+     wysokości co słup dnia. Niżej lista stoi nad grafikiem i zapas byłby dziurą. */
+  .grafik__ludzie { padding-top: var(--grafik-pas); }
+}
+
+/* ---------- lewa kolumna: lekarze ----------
+   Zapas u góry równy pasowi z nazwami dni (2.75rem): bez niego pierwszy
+   lekarz stał 44 px wyżej niż pierwszy słup i cała kolumna była
+   przesunięta względem kalendarza. Zmierzone: .grafik__osoba-btn top
+   wypadał 44 px nad .grafik__slup. */
+.grafik__ludzie {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 62rem) {
+  .grafik__ludzie { margin-top: 2.75rem; }
+}
+.grafik__osoba-btn {
+  display: grid;
+  grid-template-columns: 2.75rem 1fr auto;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+.grafik__osoba:last-child .grafik__osoba-btn { border-bottom: 1px solid var(--line); }
+.grafik__twarz {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+  background: var(--haze);
+  /* Zdjęcia zespołu są różnej jakości i różnej temperatury — jeden filtr
+     sprowadza je do wspólnego tonu, kolor wraca przy podświetleniu. */
+  filter: grayscale(0.65) contrast(1.04);
+}
+.grafik__osoba-tekst { display: grid; }
+.grafik__osoba-imie {
+  font-size: var(--step-small);
+  font-weight: 500;
+  color: var(--deep);
+  line-height: 1.25;
+}
+.grafik__osoba-rola {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--moss);
+}
+.grafik__osoba-ile {
+  font-family: var(--font-display);
+  font-size: var(--step-small);
+  color: var(--brass);
+  white-space: nowrap;
+}
+.grafik__osoba-btn:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+/* ---------- prawa kolumna: tydzień ---------- */
+.grafik__tydzien {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+/* Oś godzin. Liczby stoją dokładnie na wysokości swojej godziny. */
+.grafik__os {
+  position: relative;
+  height: var(--grafik-wys);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  /* Nazwy dni zajmują górny pas kolumn — oś musi zacząć się pod nimi. */
+  margin-top: 2.75rem;
+}
+.grafik__os li {
+  position: absolute;
+  right: 0;
+  top: calc((var(--h) - var(--grafik-od)) / (var(--grafik-do) - var(--grafik-od)) * 100%);
+  transform: translateY(-50%);
+  font-size: var(--step-eyebrow);
+  font-variant-numeric: tabular-nums;
+  color: var(--sage);
+}
+
+.grafik__dni {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(0.25rem, 0.8vw, 0.6rem);
+}
+
+.grafik__dzien { position: relative; }
+
+.grafik__nazwa {
+  height: 2.75rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: var(--font-text);
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--moss);
+  text-align: center;
+}
+.grafik__nazwa-pelna { display: none; }
+@media (min-width: 75rem) {
+  .grafik__nazwa-pelna { display: inline; }
+  .grafik__nazwa-skrot { display: none; }
+}
+/* Znacznik dzisiejszego dnia — odsłaniany przez ruch.js. */
+.grafik__dzis {
+  display: none;
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  color: var(--brass);
+}
+.grafik__dzien--dzis .grafik__nazwa { color: var(--deep); }
+.grafik__dzien--dzis .grafik__dzis { display: inline; }
+
+/* Słup dnia: zielona kolumna, w której mieszczą się dyżury.
+   Miękka, nie kanciasta: duży promień, jedno pasmo światła u góry (jak
+   światło wpadające do wody) i ledwo widoczne kreski godzin. Wcześniej
+   był to prostokąt 2 px z ostrymi krawędziami i twardą siatką — czytał
+   się jak arkusz kalkulacyjny, nie jak grafik. */
+.grafik__slup {
+  position: relative;
+  height: var(--grafik-wys);
+  border-radius: 1.125rem;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(206, 210, 190, 0.20), transparent 60%),
+    linear-gradient(to bottom,
+      color-mix(in srgb, var(--deep) 88%, #000) 0%,
+      var(--deep) 46%,
+      color-mix(in srgb, var(--deep) 82%, #000) 100%);
+  box-shadow: inset 0 1px 0 rgba(230, 234, 220, 0.18);
+  /* Kolumna wyrasta od dołu (GSAP), więc punkt zaczepienia jest na dole. */
+  transform-origin: 50% 100%;
+}
+/* Kreski godzin: co dwie godziny, na granicy widoczności. Mają dawać
+   poczucie skali, a nie rysować tabelę. */
+.grafik__slup::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(206, 210, 190, 0.09) 0 1px,
+    transparent 1px calc(100% / 4)
+  );
+  pointer-events: none;
+}
+.grafik__dzien--dzis .grafik__slup {
+  box-shadow:
+    inset 0 1px 0 rgba(230, 234, 220, 0.22),
+    inset 0 0 0 1px rgba(214, 205, 170, 0.42);
+}
+
+.grafik__tor {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.3rem;
+}
+.grafik__pasmo {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  /* Zapytanie kontenerowe: w dniu z dwoma dyżurami pasmo jest o połowę
+     węższe i nazwisko się w nim nie mieści. Zamiast łamać je na sylaby,
+     schodzi — twarz i godziny wystarczą, a pełne nazwisko stoi obok,
+     w kolumnie lekarzy. */
+  container-type: inline-size;
+}
+
+/* Dyżur. Pozycja i wysokość wprost z godzin — bez skryptu.
+   Zawartość jest z założenia drobna: mała twarz i skrót godzin. Duże
+   elementy w środku kolumny robiły z dyżuru kafel, a dyżur ma być
+   paskiem czasu, w którym od razu widać, że wtorek trwa dwa razy
+   dłużej niż sobota. */
+.grafik__blok {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc((var(--od) - var(--grafik-od)) / (var(--grafik-do) - var(--grafik-od)) * 100%);
+  height: calc((var(--do) - var(--od)) / (var(--grafik-do) - var(--grafik-od)) * 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Treść przy górnej krawędzi, czyli przy godzinie rozpoczęcia. Wyśrodkowana
+     „pływała" w kolumnie i gubiła związek z osią czasu. */
+  justify-content: flex-start;
+  gap: 0.3rem;
+  padding: 0.45rem 0.3rem;
+  border-radius: 1rem;
+  background: linear-gradient(to bottom,
+    rgba(236, 239, 228, 0.97) 0%,
+    rgba(206, 210, 190, 0.9) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(251, 250, 245, 0.6),
+    0 0.35rem 1rem rgba(16, 26, 22, 0.22);
+  color: var(--ink);
+  overflow: hidden;
+  /* Transform należy do GSAP-a, więc CSS go nie dotyka — dwa systemy na
+     jednej właściwości zawsze kończą się skokiem. */
+  transition: background-color .45s var(--ruch-krzywa, ease), box-shadow .45s var(--ruch-krzywa, ease);
+}
+.grafik__blok-twarz {
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+  box-shadow: 0 0 0 1px rgba(251, 250, 245, 0.9), 0 0 0 2px rgba(16, 26, 22, 0.1);
+  filter: grayscale(0.45);
+}
+.grafik__blok-czas {
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: var(--deep);
+  line-height: 1;
+}
+/* Nazwisko NIE stoi w pigułce. Próbowane dwa układy: poziomo (nie mieści
+   się — „Adamczyk-Kozubek" w kolumnie na 3 cm) i pionowo (mieści się, ale
+   z sześciu kolumn robi się las napisów pod kątem). Zostało: twarz jako
+   znak rozpoznawczy, godziny jako treść, pełne nazwisko w podpowiedzi przy
+   najechaniu i w kolumnie lekarzy obok. Czytnik ekranu dostaje jedno i
+   drugie z .grafik__vh. */
+.grafik__blok-kto { display: none; }
+
+/* Podpowiedź przy dyżurze — dokładana i animowana przez ruch.js.
+   Nazwisko i godziny w JEDNEJ linii, nie w dwóch: pigułka staje nad
+   nazwą dnia, a przy dwóch wierszach była na tyle wysoka, że albo
+   zasłaniała tę nazwę, albo wchodziła w nagłówek sekcji. */
+.grafik__opis {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.625rem;
+  background: var(--paper);
+  box-shadow: 0 0.6rem 1.6rem rgba(16, 26, 22, 0.28);
+  pointer-events: none;
+  opacity: 0;
+  white-space: nowrap;
+}
+.grafik__opis b {
+  font-size: var(--step-small);
+  font-weight: 600;
+  color: var(--deep);
+}
+.grafik__opis span {
+  font-size: var(--step-eyebrow);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  color: var(--brass);
+}
+
+/* Treść dla czytnika ekranu: pełne nazwisko i pełne godziny. */
+.grafik__vh {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Stan podświetlenia. Klasy dokłada ruch.js — jedna dla wybranego
+   dyżuru, druga dla wygaszonych. */
+.grafik__blok--wybrany {
+  background: var(--mist);
+  box-shadow: 0 0.5rem 1.5rem rgba(16, 26, 22, 0.35);
+}
+.grafik__blok--wybrany .grafik__blok-czas { color: var(--ink); }
+.grafik__osoba-btn--wybrany .grafik__twarz { filter: none; }
+.grafik__osoba-btn--wybrany .grafik__osoba-imie { color: var(--brass); }
+
+/* Kreska „teraz" — dokładana przez ruch.js tylko w godzinach pracy. */
+.grafik__teraz {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--brass);
+  pointer-events: none;
+}
+.grafik__teraz::after {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: -2.5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brass);
+}
+
+/* Na wąskim ekranie tydzień jedzie w poziomie zamiast ściskać sześć
+   kolumn do szerokości palca. */
+@media (max-width: 61.99rem) {
+  .grafik__tydzien { grid-template-columns: 2.25rem minmax(0, 1fr); }
+  .grafik__dni {
+    overflow-x: auto;
+    grid-template-columns: repeat(6, minmax(6.5rem, 1fr));
+    scroll-snap-type: x proximity;
+    padding-bottom: 0.5rem;
+  }
+  .grafik__dzien { scroll-snap-align: start; }
+}

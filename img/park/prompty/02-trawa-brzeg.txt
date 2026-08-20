@@ -1,0 +1,17 @@
+========================================================================
+PLIK DOCELOWY:  park/img/park/trawa-brzeg.png
+ROZMIAR:        512 x 512 px, PNG z przezroczystością
+KOLEJNOSC:      patrz README.txt — najpierw 01, potem reszta z referencja
+========================================================================
+
+WKLEJ PONIZSZE:
+
+Soft hand-painted illustration in the style of a calm misty morning, flat top-down orthographic view, gouache and watercolor texture with visible brush grain, gentle painterly shading and no hard outlines, muted desaturated natural palette, minimal and uncluttered. Use only these colors: deep forest green #1a3631, sage green #8b9a86, pale haze #ced2be, warm sand #d6cdaa, brass #8a6f39, cream #f2f1e8. Stylized, not photorealistic. No 3D render. No cartoon black outlines.
+
+A vertical strip of short soft grass forming the ragged edge of a garden path, seen straight from above. Sage green #8b9a86 with deeper #1a3631 in the shaded tufts and a few pale #ced2be blades catching light. Loose painterly brush strokes. One long side of the strip has an irregular, organic, uneven border, as if the grass grows over the path; the other side is cut off flat.
+
+CRITICAL: the top edge and the bottom edge must match each other exactly, so that stacked copies form one continuous grass edge with no visible seam.
+
+Everything outside the grass is transparent.
+
+Do not include: black outlines, cel shading, photorealism, 3D render, perspective or camera tilt, cast shadows, drop shadows, vignette, text, watermark, signature, frame or border, white background, grass on the gravel, people, buildings.

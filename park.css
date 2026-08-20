@@ -1,0 +1,140 @@
+/* ============================================================
+   DentalPark — park: akapity jako kafelki przy alejce
+   Widok z góry. Kafelek = jeden akapit, alejka wije się między
+   kafelkami i rysuje się w miarę schodzenia w dół strony.
+   Geometrię alejki liczy ruch.js z faktycznych pozycji kafelków.
+
+   Szerokość alejki i kafelka są pokrętłami do dostrojenia okiem —
+   dlatego stoją na wierzchu, jako zmienne.
+   ============================================================ */
+.park {
+  --alejka: clamp(30px, 4vw, 48px);      /* szerokość nawierzchni */
+  --alejka-trawa: 12px;                  /* pas trawy po obu stronach */
+  --kafelek: min(30rem, 42%);            /* maks. szerokość kafelka */
+  position: relative;
+  max-width: none;
+  display: grid;
+  /* Odstęp między przystankami. Było 56 px, czyli 76 px pustego pola
+     między kafelkami — przy kafelkach na 46% szerokości, ustawionych na
+     przemian po obu stronach, czytało się to jak dziura, a nie jak rytm.
+     Niżej nie schodzimy: alejka liczy trasę ze środków kafelków i przy
+     ciasnym ustawieniu robi z niej zygzak zamiast łuku. */
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+.park__sciezka {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+}
+.park__trawa {
+  stroke: color-mix(in srgb, var(--sage) 55%, transparent);
+  stroke-width: calc(var(--alejka) + var(--alejka-trawa) * 2);
+}
+.park__linia {
+  stroke: color-mix(in srgb, var(--mist) 70%, var(--cream));
+  stroke-width: var(--alejka);
+  filter: drop-shadow(0 2px 3px rgba(16, 26, 22, 0.12));
+}
+.park__ziarno {
+  stroke: var(--brass);
+  stroke-width: var(--alejka);
+  opacity: 0.16;
+}
+
+.park__kamien {
+  position: relative;
+  z-index: 1;
+  max-width: var(--kafelek);
+  padding: clamp(1.25rem, 2.5vw, 1.75rem) clamp(1.25rem, 2.5vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--paper);
+  box-shadow: 0 0.75rem 2.25rem rgba(16, 26, 22, 0.10);
+}
+/* Kafelki na przemian po obu stronach — stąd bierze się zakręt alejki.
+   Maksymalna szerokość 42% zostawia w środku wolny pas, którym alejka
+   przechodzi bez wchodzenia na tekst. */
+@media (min-width: 52rem) {
+  /* `nth-of-type` liczy tylko elementy tego samego znacznika, a ramki list
+     są takimi samymi <div> jak kafelki z akapitami — więc naprzemienność
+     obejmuje jedne i drugie i alejka wije się także wokół list zabiegów. */
+  .park > div.park__kamien:nth-of-type(odd) { margin-right: auto; }
+  .park > div.park__kamien:nth-of-type(even) { margin-left: auto; }
+}
+/* Ramka z listą zabiegów jest szersza od kafelka z akapitem: pozycji bywa
+   sześć i przy 30rem robił się z nich sznurek na pół ekranu. */
+.park__kamien--lista { max-width: min(34rem, 46%); }
+.park__kamien--lista > :is(h2, h3, h4) { margin-top: 0; }
+/* Poziom nagłówka zmienił się z h3 na h2, bo pod h1 nie było żadnego h2
+   i hierarchia miała przeskok (Lighthouse `heading-order`). Rozmiar ma
+   zostać ten sam — to zapowiedź listy wewnątrz ramki, nie tytuł sekcji na
+   pół ekranu. */
+.park__kamien--lista > h2 {
+  font-size: var(--step-h3);
+  font-weight: 400;
+  line-height: 1.25;
+}
+.park__kamien--lista > ul { margin-bottom: 0; }
+.park__kamien p { margin: 0; max-width: none; }
+.park__nr {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-family: var(--font-display);
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.14em;
+  color: var(--brass);
+}
+.park > h2, .park > h3 {
+  position: relative;
+  z-index: 1;
+  margin-top: 1rem;
+  max-width: var(--kafelek);
+}
+.park > ul { position: relative; z-index: 1; }
+
+/* Na wąskim ekranie kafelki idą jedną kolumną, a wijąca się pod nimi
+   alejka byłaby zygzakiem bez powodu — schodzi. */
+@media (max-width: 51.99rem) {
+  .park__sciezka { display: none; }
+  .park { gap: 1.25rem; }
+  .park { --kafelek: 100%; }
+  /* Ramka z listą ma własną szerokość maksymalną (46% kolumny), żeby na
+     szerokim ekranie alejka miała tędy przejść. Na telefonie alejki nie ma
+     w ogóle — a ramka i tak zwężała się do 46%, czyli 161 px, i pozycje
+     listy wychodziły poza nią. Tu ma być pełna szerokość, jak każdy inny
+     kafelek. */
+  .park__kamien--lista { max-width: 100%; }
+}
+
+
+/* ---------- park rzadki: dwie kolumny ----------
+   Na stronach z jednym-dwoma akapitami (leczenie kanalowe, narkoza) jeden
+   wysoki kafelek po lewej zostawial pusta prawa polowe ekranu. Przy tak
+   malej liczbie przystankow uklad przechodzi na dwie kolumny: akapit po
+   lewej, listy zabiegow po prawej, w osobnym pojemniku (dokłada go
+   usluga.js). Pojemnik jest wazny — bez niego trzeba bylo rozciagac
+   pierwszy kafelek na wiele wierszy siatki, a siatka tworzyla wtedy tyle
+   pustych wierszy, ile jej kazano. */
+@media (min-width: 52rem) {
+  .park--rzadki {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    column-gap: clamp(2rem, 5vw, 4rem);
+  }
+  .park--rzadki > .park__kamien { max-width: none; margin: 0; }
+  .park--rzadki > .park__kolumna {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+    margin-top: clamp(2rem, 6vw, 5rem);
+  }
+  .park--rzadki > .park__kolumna > .park__kamien { max-width: none; margin: 0; }
+}
+/* Park rzadki idzie BEZ alejki: przy dwoch kolumnach i trzech blokach
+   alejka nie ma czego laczyc — byla pionowa kreska miedzy kolumnami,
+   ktora nie mowila nic, czego nie mowi sam uklad. */
+.park--rzadki .park__sciezka { display: none; }

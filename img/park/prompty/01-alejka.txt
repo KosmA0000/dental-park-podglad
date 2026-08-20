@@ -1,0 +1,17 @@
+========================================================================
+PLIK DOCELOWY:  park/img/park/alejka.png
+ROZMIAR:        512 x 512 px, PNG z przezroczystością
+KOLEJNOSC:      patrz README.txt — najpierw 01, potem reszta z referencja
+========================================================================
+
+WKLEJ PONIZSZE:
+
+Soft hand-painted illustration in the style of a calm misty morning, flat top-down orthographic view, gouache and watercolor texture with visible brush grain, gentle painterly shading and no hard outlines, muted desaturated natural palette, minimal and uncluttered. Use only these colors: deep forest green #1a3631, sage green #8b9a86, pale haze #ced2be, warm sand #d6cdaa, brass #8a6f39, cream #f2f1e8. Stylized, not photorealistic. No 3D render. No cartoon black outlines.
+
+A vertical strip of a fine gravel garden path seen straight from above. The path fills the entire frame from the left edge to the right edge, and runs continuously from the top edge to the bottom edge. Warm sand-colored gravel #d6cdaa with sparse brass #8a6f39 speckles and a few paler pebbles in #f2f1e8.
+
+CRITICAL: the top edge and the bottom edge must match each other exactly, so that copies of this image stacked one above another form one continuous, unbroken path with no visible seam. The gravel texture must run off both the top and the bottom edge mid-pebble.
+
+The left and right edges are cut off flat at the frame border. Everything outside the path is transparent.
+
+Do not include: black outlines, cel shading, photorealism, 3D render, perspective or camera tilt, cast shadows, drop shadows, vignette, text, watermark, signature, frame or border, white background, grass on the gravel, people, buildings.

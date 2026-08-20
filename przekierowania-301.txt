@@ -1,0 +1,69 @@
+Przekierowania 301 — stara witryna → nowa
+=========================================
+
+Do wgrania RAZEM z nową wersją witryny. Bez tego 10 zaindeksowanych
+podstron traci całą historię w Google i startuje od zera.
+
+Zasada z briefu brzmi „nie zmieniamy adresów URL istniejących podstron".
+Nowa wersja ma inne nazwy plików, więc zasadę realizuje się tu przez
+jeden skok 301 — adres kanoniczny wskazuje wyłącznie nowy adres, stary
+oddaje mu swoją historię.
+
+
+nginx
+-----
+
+    # stara struktura -> nowa
+    location = /uslugi-stomatologiczne/                                        { return 301 https://www.dentalpark.kie.pl/oferta.html; }
+    location = /uslugi-stomatologiczne/implanty-zebow.html                     { return 301 https://www.dentalpark.kie.pl/implanty.html; }
+    location = /uslugi-stomatologiczne/protetyka-pracownia-protetyczna.html    { return 301 https://www.dentalpark.kie.pl/protetyka.html; }
+    location = /uslugi-stomatologiczne/chirurgia-stomatologiczna.html          { return 301 https://www.dentalpark.kie.pl/chirurgia.html; }
+    location = /uslugi-stomatologiczne/leczenie-kanalowe-pod-mikroskopem.html  { return 301 https://www.dentalpark.kie.pl/leczenie-kanalowe.html; }
+    location = /uslugi-stomatologiczne/leczenie-zebow-w-narkozie.html          { return 301 https://www.dentalpark.kie.pl/narkoza.html; }
+    location = /uslugi-stomatologiczne/stomatologia-estetyczna.html            { return 301 https://www.dentalpark.kie.pl/stomatologia-estetyczna.html; }
+    location = /ponizej-przedstawiamy-galerie-zdjec-z-dental-parku.html        { return 301 https://www.dentalpark.kie.pl/galeria.html; }
+    location = /dobre-rady.html                                               { return 301 https://www.dentalpark.kie.pl/dobre-rady.html; }
+    location = /kontakt.html                                                  { return 301 https://www.dentalpark.kie.pl/kontakt.html; }
+
+    # stara mapa witryny wskazywała na adres zwracający 502 — ma zniknąć
+    location = /sitemap_index.xml { return 410; }
+
+
+Apache (.htaccess)
+------------------
+
+    RewriteEngine On
+    RewriteRule ^uslugi-stomatologiczne/?$                                       /oferta.html [R=301,L]
+    RewriteRule ^uslugi-stomatologiczne/implanty-zebow\.html$                    /implanty.html [R=301,L]
+    RewriteRule ^uslugi-stomatologiczne/protetyka-pracownia-protetyczna\.html$   /protetyka.html [R=301,L]
+    RewriteRule ^uslugi-stomatologiczne/chirurgia-stomatologiczna\.html$         /chirurgia.html [R=301,L]
+    RewriteRule ^uslugi-stomatologiczne/leczenie-kanalowe-pod-mikroskopem\.html$ /leczenie-kanalowe.html [R=301,L]
+    RewriteRule ^uslugi-stomatologiczne/leczenie-zebow-w-narkozie\.html$         /narkoza.html [R=301,L]
+    RewriteRule ^uslugi-stomatologiczne/stomatologia-estetyczna\.html$           /stomatologia-estetyczna.html [R=301,L]
+    RewriteRule ^ponizej-przedstawiamy-galerie-zdjec-z-dental-parku\.html$       /galeria.html [R=301,L]
+
+
+Reszta konfiguracji serwera (poza tym plikiem)
+----------------------------------------------
+
+Z briefu, sekcja 03-FIX-TECHNICZNY — do zrobienia po stronie hostingu,
+nie da się tego zamknąć w plikach witryny:
+
+  * jeden skok 301 na kanoniczny host https://www.dentalpark.kie.pl
+    (dziś apex https schodzi do http, a docelowy adres ma jawny port :443)
+  * Strict-Transport-Security, X-Content-Type-Options, Referrer-Policy,
+    X-Frame-Options — dopiero PO potwierdzeniu, że HTTPS działa wszędzie
+  * 404 zamiast 502 dla nieistniejących adresów
+  * Cache-Control: private, max-age=0, must-revalidate zamiast no-store
+
+
+Sprawdzenie po wdrożeniu
+------------------------
+
+    curl -so /dev/null -w "%{http_code} %{redirect_url}\n" \
+      https://www.dentalpark.kie.pl/uslugi-stomatologiczne/implanty-zebow.html
+    # oczekiwane: 301 https://www.dentalpark.kie.pl/implanty.html
+
+    curl -so /dev/null -w "robots: %{http_code}\n"  https://www.dentalpark.kie.pl/robots.txt   # 200
+    curl -so /dev/null -w "sitemap: %{http_code}\n" https://www.dentalpark.kie.pl/sitemap.xml  # 200
+    curl -so /dev/null -w "404: %{http_code}\n"     https://www.dentalpark.kie.pl/test-xyz/    # 404

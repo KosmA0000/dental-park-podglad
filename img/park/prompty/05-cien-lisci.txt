@@ -1,0 +1,17 @@
+========================================================================
+PLIK DOCELOWY:  park/img/park/cien-lisci.png
+ROZMIAR:        1600 x 1600 px, PNG z przezroczystością
+KOLEJNOSC:      patrz README.txt — najpierw 01, potem reszta z referencja
+========================================================================
+
+WKLEJ PONIZSZE:
+
+Soft hand-painted illustration in the style of a calm misty morning, flat top-down orthographic view, gouache and watercolor texture with visible brush grain, gentle painterly shading and no hard outlines, muted desaturated natural palette, minimal and uncluttered. Use only these colors: deep forest green #1a3631, sage green #8b9a86, pale haze #ced2be, warm sand #d6cdaa, brass #8a6f39, cream #f2f1e8. Stylized, not photorealistic. No 3D render. No cartoon black outlines.
+
+Dappled shadow cast by sparse tree foliage, seen from directly above on flat ground. Show ONLY the shadow shapes themselves — not the leaves, not the ground, not the tree. The shadow is painted in a single flat dark tone with soft blurred edges, forming irregular organic patches with gaps of open light between them. Roughly half the frame is shadow, half is empty.
+
+CRITICAL: the image must tile seamlessly in both directions — the top edge matches the bottom edge, and the left edge matches the right edge, with shadow shapes running off the edges and continuing on the opposite side.
+
+Everything that is not shadow is transparent.
+
+Do not include: black outlines, cel shading, photorealism, 3D render, perspective or camera tilt, cast shadows, drop shadows, vignette, text, watermark, signature, frame or border, white background, grass on the gravel, people, buildings.

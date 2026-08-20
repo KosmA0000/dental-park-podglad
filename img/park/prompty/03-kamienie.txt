@@ -1,0 +1,17 @@
+========================================================================
+PLIK DOCELOWY:  park/img/park/kamienie.png
+ROZMIAR:        1024 x 1024 px, PNG z przezroczystością
+KOLEJNOSC:      patrz README.txt — najpierw 01, potem reszta z referencja
+========================================================================
+
+WKLEJ PONIZSZE:
+
+Soft hand-painted illustration in the style of a calm misty morning, flat top-down orthographic view, gouache and watercolor texture with visible brush grain, gentle painterly shading and no hard outlines, muted desaturated natural palette, minimal and uncluttered. Use only these colors: deep forest green #1a3631, sage green #8b9a86, pale haze #ced2be, warm sand #d6cdaa, brass #8a6f39, cream #f2f1e8. Stylized, not photorealistic. No 3D render. No cartoon black outlines.
+
+Eight separate flat river stones and four small moss tufts, seen straight from above, scattered far apart across the frame. Each object is fully isolated: none of them touch, overlap or come close to another, and none of them touch the frame edges. Leave wide empty transparent space between the objects.
+
+Stones are simple rounded organic shapes in pale haze #ced2be and sage #8b9a86 with soft painted highlights and a hint of warm sand #d6cdaa. Moss tufts are deep green #1a3631.
+
+Everything between and around the objects is transparent.
+
+Do not include: black outlines, cel shading, photorealism, 3D render, perspective or camera tilt, cast shadows, drop shadows, vignette, text, watermark, signature, frame or border, white background, grass on the gravel, people, buildings.

@@ -1,0 +1,530 @@
+/* ============================================================
+   PODSTRONY USŁUG — struktura i ruch
+
+   Sześć podstron (estetyczna, implanty, protetyka, chirurgia, kanałowe,
+   narkoza) miało dokładnie jeden układ: okruszek, nagłówek, jeden akapit na
+   tysiąc kilkaset znaków i dwie listy pod spodem. Ściana tekstu bez punktu
+   zaczepienia — czytelnik nie wiedział, ile jeszcze przed nim, ani gdzie
+   szukać tej jednej rzeczy, po którą przyszedł.
+
+   Cała treść zostaje co do słowa. Zmienia się to, jak jest podana:
+   pierwsze zdanie wychodzi na prowadzenie, śródtytuły dostają boczny indeks
+   z zaznaczeniem miejsca, w którym jesteś, a listy przestają być punktami
+   i stają się wierszami z własnym rytmem wejścia.
+
+   Wszystko to dokłada `usluga.js` po wczytaniu strony. Bez JavaScriptu strona
+   wygląda tak jak dotąd i czyta się w całości — nic nie jest ukryte przed
+   odsłonięciem.
+   ============================================================ */
+
+/* ---------- pas nagłówkowy ---------- */
+/* Nagłówek usługi siada na głębi wody, tak jak sekcje na stronie głównej.
+   Podstrona przestaje być kartką i staje się kolejnym przystankiem. */
+.usluga-pas {
+  background: var(--deep);
+  color: var(--sky);
+  position: relative;
+  overflow: hidden;
+  /* Pasek nawigacji stoi na stałe u góry i ma 86 px. Bez własnego
+     odstępu okruszek „powrót do…" wchodził pod logotyp — leżał 51 px
+     od góry, czyli w połowie paska. Odstęp liczy się więc od DOŁU
+     paska, nie od krawędzi okna. */
+  padding-top: clamp(7.5rem, 9vw, 9.5rem);
+}
+.usluga-pas .crumb a { color: var(--haze); }
+.usluga-pas .crumb a:hover { color: var(--mist); }
+.usluga-pas h1 { color: var(--paper); }
+.usluga-pas .lead { color: var(--sky); }
+
+/* Nitka dentystyczna wypadła z całej strony — także stąd. Był to pionowy
+   gradient udający nić przy prawej krawędzi pasa. Pas trzyma się teraz
+   samym kolorem głębi, bez rekwizytu. */
+
+/* ---------- układ: szyna indeksu plus treść ----------
+   Szyna ma stałą szerokość na każdej podstronie — także tam, gdzie nie ma
+   z czego zbudować indeksu. Dzięki temu kolumna z tekstem zaczyna się
+   zawsze w tym samym miejscu; wcześniej narkoza i leczenie kanałowe miały
+   tekst przesunięty względem implantów i protetyki. */
+.usluga-uklad { display: block; }
+
+@media (min-width: 62rem) {
+  .usluga-uklad {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: start;
+  }
+  .usluga-indeks { position: sticky; top: 6.5rem; }
+}
+
+/* ---------- indeks śródtytułów ----------
+   Zwinięty do szyny ze strzałką. Nagłówek „Na tej stronie" zajmował
+   miejsce i powtarzał to, co widać z samej listy. Panel wysuwa się NAD
+   treścią (position: absolute), więc rozwinięcie nie przesuwa tekstu
+   ani o piksel. */
+.usluga-indeks {
+  display: none;
+  position: relative;
+  z-index: 3;
+}
+@media (min-width: 62rem) { .usluga-indeks { display: block; } }
+
+.usluga-indeks__uchwyt {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  width: 3rem;
+  padding: 0.75rem 0;
+  border: 0;
+  border-left: 1px solid var(--line);
+  background: none;
+  color: var(--moss);
+}
+.usluga-indeks__strzalka {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  color: var(--brass);
+  background: var(--paper);
+}
+.usluga-indeks__etykieta {
+  writing-mode: vertical-rl;
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.usluga-indeks__uchwyt:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+.usluga-indeks__panel {
+  position: absolute;
+  left: 2.75rem;
+  top: 0;
+  width: 15rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--paper);
+  box-shadow: 0 1rem 2.5rem rgba(16, 26, 22, 0.14);
+  /* Stan wyjściowy dla GSAP-a; bez skryptu panel jest po prostu widoczny
+     obok szyny (reguła niżej). */
+  opacity: 0;
+  visibility: hidden;
+}
+html:not(.js-ruch) .usluga-indeks__panel { opacity: 1; visibility: visible; position: static; width: auto; }
+
+.usluga-indeks a {
+  display: block;
+  position: relative;
+  padding: 0.4rem 0;
+  font-size: var(--step-small);
+  line-height: 1.35;
+  color: var(--moss);
+  text-decoration: none;
+}
+.usluga-indeks a::before {
+  content: '';
+  position: absolute;
+  left: -0.9rem;
+  top: 0.95em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--line);
+  transition: background-color .35s var(--ruch-krzywa, ease);
+}
+.usluga-indeks a:hover { color: var(--deep); }
+.usluga-indeks a[aria-current="true"] { color: var(--deep); font-weight: 500; }
+.usluga-indeks a[aria-current="true"]::before { background: var(--brass); }
+
+/* Pusta szyna na stronach bez śródtytułów — sama kolumna, bez rysunku. */
+.usluga-indeks--pusta { display: none; }
+@media (min-width: 62rem) { .usluga-indeks--pusta { display: block; } }
+
+/* ---------- pierwsze zdanie na prowadzenie ---------- */
+/* Definicja zabiegu wychodzi przed resztę akapitu. Ta sama kolejność słów,
+   ta sama treść — tylko czytelnik od razu wie, o czym to jest, zamiast
+   szukać sensu w połowie ściany. */
+.prose__otwarcie {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.1vw, 1.75rem);
+  font-weight: 300;
+  line-height: 1.32;
+  letter-spacing: -0.015em;
+  color: var(--deep);
+  margin-bottom: 0.9rem;
+}
+
+/* ---------- zabiegi i usługi: wiersze na szynie ----------
+   Jedna forma dla wszystkich wyliczeń tego typu na całej stronie. Bez
+   myślników i bez numerów: myślnik był resztką po liście punktowanej,
+   a numer sugerowałby kolejność, której w tych zabiegach nie ma.
+
+   Po lewej biegnie szyna, a po niej jedzie znacznik pokazujący, w którym
+   miejscu listy jest czytelnik — pozycję znacznika liczy ruch.js z postępu
+   przewijania. Wiersz, przy którym akurat stoi znacznik, ciemnieje.
+   Bez skryptu szyna jest zwykłą kreską, a wiersze są w pełni czytelne. */
+.prose ul.zabiegi {
+  position: relative;
+  display: grid;
+  gap: 0.5rem;
+  margin: 1.25rem 0 0;
+  padding: 0 0 0 1.75rem;
+  list-style: none;
+  border: 0;
+}
+/* Szyna. */
+.prose ul.zabiegi::before {
+  content: '';
+  position: absolute;
+  left: 0.3rem;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  width: 1px;
+  background: var(--line);
+}
+/* Znacznik jadący po szynie — dokłada go ruch.js. */
+.zabiegi__znacznik {
+  position: absolute;
+  left: 0.3rem;
+  top: 0;
+  width: 7px;
+  height: 7px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: var(--brass);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brass) 22%, transparent);
+  will-change: transform;
+}
+/* Każdy zabieg jest osobnym kafelkiem, nie wierszem oddzielonym kreską:
+   to są osobne rzeczy, które gabinet robi, a nie kolejne zdania jednej
+   listy. Ramka zapala się na głębię (--deep) przy najechaniu — ten sam
+   kolor, który prowadzi całą stronę. */
+.prose ul.zabiegi > li {
+  position: relative;
+  margin: 0;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.875rem;
+  background: var(--paper);
+  line-height: 1.45;
+  color: var(--moss);
+  transition: color .35s var(--ruch-krzywa, ease),
+              border-color .35s var(--ruch-krzywa, ease),
+              background-color .35s var(--ruch-krzywa, ease);
+}
+.prose ul.zabiegi > li:hover {
+  border-color: var(--deep);
+  color: var(--deep);
+}
+.prose ul.zabiegi > li::before { display: none; }
+.prose ul.zabiegi > li strong { font-weight: 500; color: var(--deep); }
+/* Kafelek, przy którym stoi znacznik postępu czytania. Bursztyn, nie
+   głębia — inaczej nie dałoby się odróżnić „tu jestem" od „tu mam kursor". */
+.prose ul.zabiegi > li.jest-tu {
+  color: var(--deep);
+  border-color: color-mix(in srgb, var(--brass) 55%, var(--line));
+  background: color-mix(in srgb, var(--cream) 60%, var(--paper));
+}
+
+/* ---------- odsłonięcie ----------
+   Wyjęte stąd: ruch wejścia wierszy (klasy + transition + --i) i pasek
+   postępu na `animation-timeline: scroll()`. Oba były drugim systemem
+   ruchu obok GSAP-a, na tych samych elementach — a dwa systemy na jednej
+   właściwości zawsze kończą się skokiem. Robi to teraz ruch.js, sekcja
+   „PODSTRONY"; pasek postępu jest jeden na całą stronę, w nagłówku. */
+
+/* ---------- lista haseł jako karty ----------
+   Krótkie pozycje („usuwanie zębów", „wypełnianie ubytków") były najpierw
+   punktami listy, potem pigułkami. Pigułka wygląda jak etykieta czegoś —
+   filtr, tag, znacznik — a to jest zakres zabiegów, czyli treść. Karta z
+   kreską mówi to samo, co reszta strony: kafel = jedna rzecz, którą
+   robimy. Klasę dokłada usluga.js po zmierzeniu najdłuższej pozycji.
+   Ogony interpunkcyjne (przecinki, kropka) zdejmuje ten sam skrypt. */
+.prose ul.usluga-wiersze--kafle {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0 2rem;
+  border: 0;
+}
+.prose ul.usluga-wiersze--kafle > li {
+  margin: 0;
+  padding: 1rem 1.1rem 1rem 2.25rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--paper);
+  font-size: var(--step-small);
+  line-height: 1.45;
+  color: var(--deep);
+}
+.prose ul.usluga-wiersze--kafle > li::before {
+  content: '';
+  position: absolute;
+  left: 1.1rem;
+  top: 1.55rem;
+  width: 0.75rem;
+  height: 1px;
+  background: var(--brass);
+}
+.prose ul.usluga-wiersze--kafle > li strong { font-weight: 500; }
+
+/* ============================================================
+   ŚCIEŻKA OFERTY
+   Sześć zabiegów jako sześć przystanków jednej trasy. Kreska biegnie
+   przez wszystkie, przystanek bieżący jest wypełniony. To jedyne
+   miejsce, w którym podstrona mówi „jesteś tutaj, a dalej jest to".
+   Ruch (rysowanie kreski, wejście przystanków, przejście w bok)
+   robi ruch.js.
+   ============================================================ */
+.trasa {
+  border-top: 1px solid var(--line);
+  padding-block: clamp(2.5rem, 5vw, 4rem);
+  background: var(--cream);
+}
+.trasa__tytul {
+  margin: 0 0 clamp(1.5rem, 3vw, 2.5rem);
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.trasa__tor { position: relative; }
+/* Kreska trasy — pod przystankami, na całej szerokości. */
+.trasa__linia {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0.35rem;
+  width: 100%;
+  height: 1.5rem;
+  color: var(--sage);
+  overflow: visible;
+  pointer-events: none;
+}
+.trasa__stopy {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.trasa__stopy a {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  padding-top: 0.1rem;
+  text-align: center;
+  text-decoration: none;
+  color: var(--moss);
+}
+.trasa__kropka {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  border: 1px solid var(--sage);
+  background: var(--cream);
+}
+.trasa__stop--tu .trasa__kropka { background: var(--brass); border-color: var(--brass); }
+.trasa__nr {
+  font-family: var(--font-display);
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.12em;
+  color: var(--brass);
+}
+.trasa__nazwa {
+  font-size: var(--step-eyebrow);
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+}
+.trasa__stop--tu .trasa__nazwa { color: var(--deep); font-weight: 600; }
+.trasa__stopy a:focus-visible { outline: 2px solid var(--brass); outline-offset: 4px; }
+
+.trasa__ster {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+.trasa__krok {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  background: var(--paper);
+  text-decoration: none;
+  color: var(--deep);
+  font-size: var(--step-small);
+}
+.trasa__krok span { display: grid; }
+.trasa__krok small {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.trasa__krok--dalej { margin-left: auto; text-align: right; }
+.trasa__krok--dalej span { justify-items: end; }
+
+/* Na wąskim ekranie sześć podpisów obok siebie to sześć słupków po jednej
+   literze — zostają numery i kropki, nazwy schodzą. */
+@media (max-width: 47.99rem) {
+  .trasa__nazwa { display: none; }
+  .trasa__ster { flex-direction: column; }
+  .trasa__krok--dalej { margin-left: 0; }
+}
+
+
+/* ---------- zabiegi w ramce (poza parkiem) ----------
+   Nagłówek i lista pod nim to jeden przystanek. Ramkę dokłada usluga.js,
+   bo znaczniki przychodzą z treści i nie ma w nich takiego pudełka. */
+.blok-lista {
+  padding: clamp(1.25rem, 2.5vw, 1.75rem) clamp(1.25rem, 2.5vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--paper);
+  box-shadow: 0 0.75rem 2.25rem rgba(16, 26, 22, 0.06);
+}
+.prose .blok-lista > :is(h2, h3, h4) { margin-top: 0; }
+/* Ten sam powód, co w park.css: nagłówek awansował do h2 dla hierarchii,
+   ale w ramce z listą ma zostać zapowiedzią, nie tytułem sekcji. */
+.prose .blok-lista > h2 { font-size: var(--step-h3); font-weight: 400; line-height: 1.25; }
+.prose .blok-lista > ul { margin-bottom: 0; }
+
+/* ---------- strzałki skoku do sąsiedniej oferty ----------
+   Przypięte do kadru przy jego bokach, w połowie wysokości, więc jadą
+   razem z przewijaniem. Zwinięte to samo kółko ze strzałką; najechanie
+   wysuwa nazwę zabiegu, do którego prowadzą — klik nie ma być skokiem
+   w ciemno. Pokazują się dopiero po zjechaniu z góry strony, bo tam
+   widać jeszcze pełną listę ofert. */
+.skok {
+  position: fixed;
+  top: 50%;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transform: translateY(-50%);
+  text-decoration: none;
+  color: var(--deep);
+}
+.skok--lewo { left: clamp(0.75rem, 2vw, 1.75rem); }
+.skok--prawo { right: clamp(0.75rem, 2vw, 1.75rem); flex-direction: row-reverse; }
+.skok__kolo {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0.75rem 2rem rgba(16, 26, 22, 0.14);
+}
+.skok__nazwa {
+  display: grid;
+  max-width: 12rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 0.75rem;
+  background: var(--paper);
+  box-shadow: 0 0.75rem 2rem rgba(16, 26, 22, 0.16);
+  font-size: var(--step-small);
+  line-height: 1.25;
+}
+.skok--prawo .skok__nazwa { text-align: right; }
+.skok__nazwa small {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.skok:focus-visible .skok__kolo { outline: 2px solid var(--brass); outline-offset: 3px; }
+@media (max-width: 61.99rem) { .skok { display: none; } }
+
+/* ============================================================
+   PORADY KROK PO KROKU
+   Jedyne miejsce w serwisie, w którym odbiorcą jest rodzic wystraszonego
+   dziecka, a nie pacjent szukający procedury — więc forma jest cieplejsza
+   niż reszta strony: większe zaokrąglenia, krok po kroku, jeden wyraźny
+   numer. Paleta bez zmian: te same kolory, co wszędzie indziej. Gabinet
+   w obszarze zdrowia nie zyskuje na wyglądaniu jak gra.
+
+   Rysunki są dodatkiem, nie warunkiem: bez plików kafelek działa z samym
+   numerem, a kiedy pliki się pojawią, wchodzą w gotowe miejsce.
+   ============================================================ */
+.porady { margin: 0; }
+.porady__wstep {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2rem);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: 1.75rem;
+  background: color-mix(in srgb, var(--sage) 22%, var(--paper));
+}
+.porady__wstep h2 { margin: 0 0 0.5rem; font-size: var(--step-h3); }
+.porady__wstep p { margin: 0; font-size: var(--step-small); color: var(--moss); }
+
+.kroki {
+  display: grid;
+  gap: 0.75rem;
+  margin: clamp(1.25rem, 3vw, 2rem) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+.krok {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0 clamp(0.75rem, 2vw, 1.25rem);
+  margin: 0;
+  padding: clamp(1rem, 2.5vw, 1.4rem);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  background: var(--paper);
+}
+.krok__nr {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--deep);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.krok__tresc { display: grid; gap: 0.2rem; }
+.krok__tresc b {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--deep);
+}
+.krok__tresc span { font-size: var(--step-small); line-height: 1.6; color: var(--moss); }
+.porady__stopka {
+  margin: clamp(1.25rem, 3vw, 1.75rem) 0 0;
+  font-size: var(--step-small);
+  color: var(--moss);
+}
+@media (max-width: 34rem) {
+  .porady__wstep { flex-direction: column; text-align: center; }
+  .krok { grid-template-columns: auto minmax(0, 1fr); }
+  
+}
+
+/* Dwa bloki porad na jednej stronie — potrzebują między sobą oddechu,
+   inaczej siedem kafelków wchodzi wprost pod pięć poprzednich. */
+.porady + .porady { margin-top: clamp(2.5rem, 6vw, 4.5rem); }

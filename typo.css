@@ -1,0 +1,112 @@
+/* ============================================================
+   DentalPark — typografia
+   Wczytywany PO styles.css. Nadpisuje tokeny kroju i skali;
+   nie dotyka palety, układu ani treści.
+
+   Para: Newsreader (display) + Public Sans (tekst).
+   Oś kontrastu: szeryf redakcyjny o zmiennej wielkości optycznej
+   przeciw monolinearnemu groteskowi urzędowemu.
+   Głos: zielnikowy i rzeczowy (arkusz zobowiązań §2–§3).
+
+   <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300..600&family=Public+Sans:ital,wght@0,300..600;1,300..600&display=swap" rel="stylesheet">
+
+   Pomiary, na których stoją poniższe liczby (z plików TTF, tabele OS/2 + head):
+     Fraunces    x/em 0.482   x/cap 0.689   tnum: brak
+     Newsreader  x/em 0.426   x/cap 0.636   tnum: jest
+     Inter       x/em 0.546   x/cap 0.750   tnum: jest
+     Public Sans x/em 0.517   x/cap 0.715   tnum: jest
+   Stąd: stopnie display rosną o ~7% (wysokość x Newsreadera to 88%
+   wysokości x Frauncesa), stopnie tekstowe o ~6% (Public Sans to 95%
+   Intera), a stopień wersalikowy zostaje bez zmian — wysokości
+   wersalików obu krojów tekstowych różnią się o 0,7%.
+   ============================================================ */
+
+:root {
+  --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-text: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Skala przejęta ze styles.css, przeliczona na nowe kroje.
+     Górna granica --step-display zatrzymuje się na 6rem: arkusz
+     zobowiązań §4 łamie tik „logotyp jako bohater", więc bohaterem
+     hero jest nitka i ząb, a nie litery. Reszty optycznej straty
+     (~3%) świadomie nie nadrabiamy. */
+  --step-display: clamp(3rem, 6.8vw, 6rem);
+  --step-h1:      clamp(2.4rem, 5.3vw, 4.25rem);
+  --step-h2:      clamp(2rem, 3.85vw, 3.2rem);
+  --step-h3:      clamp(1.3125rem, 2vw, 1.75rem);
+  --step-lead:    clamp(1.125rem, 1.55vw, 1.375rem);
+  --step-body:    1.125rem;
+  --step-small:   0.9rem;
+  --step-eyebrow: 0.75rem;
+
+  /* Public Sans jest szerszy od Intera, a polskie słowa są długie.
+     68ch dawało ~80 znaków w wierszu — powyżej progu czytelności. */
+  --max-prose: 64ch;
+}
+
+/* Polski to język z ogonkami pod linią bazową i akcentami nad wysokością x
+   w tym samym wierszu. 1,7 było ustawione pod duży rysunek Intera; przy
+   Public Sans 1,62 daje ten sam prześwit między wierszami i mniej rozjazdu
+   w długich akapitach. */
+body { line-height: 1.62; }
+
+/* ---------- nagłówki ---------- */
+/* 'SOFT'/'WONK' to osie Frauncesa — po zmianie kroju są martwe.
+   Zerujemy je i oddajemy pole automatycznej wielkości optycznej:
+   Newsreader ma oś opsz 6–72, więc przy 96px sam wyostrza szeryfy
+   i podnosi kontrast, a przy 21px wraca do rysunku tekstowego.
+   Jedna deklaracja zamiast ręcznego opsz na każdym stopniu. */
+h1, h2, h3, h4 {
+  font-variation-settings: normal;
+  font-optical-sizing: auto;
+}
+
+/* Newsreader ma światła międzyliterowe ustawione pod czytanie, nie pod
+   plakat — w dużych stopniach trzeba je ściągnąć. Im mniejszy stopień,
+   tym mniej ściągamy; przy h3 zostaje niemal rysunek oryginalny. */
+h1, h2 {
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.018em;
+}
+h3 {
+  font-weight: 400;
+  line-height: 1.22;
+  letter-spacing: -0.005em;
+}
+h4 { line-height: 1.4; letter-spacing: 0; }
+
+/* Hero: jedyny stopień, w którym nagłówek łamie się na dwa wiersze,
+   a łamie się dokładnie tak, że ogonek ę z „Piękny" stoi nad akcentem ś
+   z „uśmiech" — najgorszy możliwy przypadek w tym zdaniu.
+   Zmierzone na renderze przy 104px: przy 0,92 ogonek wchodzi w akcent,
+   przy 0,96 prawie się stykają, przy 1,00 zostaje włos prześwitu.
+   1,02 daje pewny odstęp, a blok nagłówka jeszcze się nie rozjeżdża. */
+.hero h1 {
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+
+.lead { font-weight: 300; line-height: 1.55; }
+
+/* Wordmark: mała wysokość x Newsreadera zjada „dentalpark" w pasku,
+   więc logo idzie o stopień w górę przy tej samej wadze. */
+.logo { font-size: 1.5rem; letter-spacing: -0.005em; }
+
+/* ---------- cyfry ---------- */
+/* Cyfry tabelarne tylko tam, gdzie liczby stoją w kolumnie albo jedna
+   pod drugą: godziny przyjęć, telefony, liczby w pasku faktów. W biegnącym
+   akapicie zostają proporcjonalne — „powstała w 1999 r." ma się czytać
+   jak zdanie, nie jak tabela. */
+.person__hours,
+.masthead__tel,
+.hero__meta,
+.contact-list dd,
+.footer address,
+.fact dt {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Wielka liczba w pasku faktów: Newsreader w 36px, więc ta sama korekta
+   świateł co przy h2. */
+.fact dt { letter-spacing: -0.015em; }

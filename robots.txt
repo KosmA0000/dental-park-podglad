@@ -1,0 +1,4 @@
+# Podgląd roboczy — nie do indeksowania.
+# Strona właściwa: https://www.dentalpark.kie.pl/
+User-agent: *
+Disallow: /

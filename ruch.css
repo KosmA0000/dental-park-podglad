@@ -1,0 +1,742 @@
+/* ============================================================
+   DentalPark — system ruchu (arkusz)
+   Cały ruch robi GSAP w park/ruch.js. Ten plik daje mu tylko:
+     1. stany wyjściowe, żeby nic nie mrugało przed pierwszą klatką,
+     2. składy elementów, które istnieją WYŁĄCZNIE dla ruchu
+        (pas w ruchu, wskaźnik filmu, karuzela zdjęć, półka oferty,
+        lupa galerii, porównanie przed/po),
+     3. wersję dla prefers-reduced-motion, w której nic się nie rusza,
+        a wszystko jest widoczne.
+
+   Zero @keyframes, zero animation-timeline. Jeden system, nie dwa.
+   ============================================================ */
+
+:root {
+  --ruch-krzywa:  cubic-bezier(.22, 1, .36, 1);
+  --ruch-czas:    .9s;
+  --ruch-dystans: 1.1rem;
+}
+
+/* ScrollTrigger liczy pozycje po każdym refreshu; CSS-owe gładkie
+   przewijanie rozjeżdża mu wtedy pomiary (typowy błąd nr 9 z listy
+   gsap.com/resources/st-mistakes). Gładkie przewijanie robi
+   ScrollSmoother, więc przeglądarkowe musi być wyłączone. */
+html { scroll-behavior: auto !important; }
+
+/* Pasek jest `fixed`, więc kotwice muszą mieć zapas pod nim. */
+section[id], [id] { scroll-margin-top: 6rem; }
+
+/* ------------------------------------------------------------
+   1. STANY WYJŚCIOWE
+   Elementy, które GSAP odsłania, muszą startować schowane — ale
+   tylko wtedy, gdy skrypt naprawdę wystartował. Klasę `js-ruch`
+   dokłada ruch.js na <html> w pierwszej linii; bez niej (błąd
+   wczytania, wyłączony JS) strona jest zwyczajnie widoczna.
+   ------------------------------------------------------------ */
+.js-ruch [data-rozbij] { visibility: hidden; }
+.js-ruch .hero__film { opacity: 0; }
+
+/* ------------------------------------------------------------
+   2. HERO — wskaźniki filmu
+   ------------------------------------------------------------ */
+
+/* Licznik filmu — jedyna informacja zwrotna w czasie blokady
+   przewijania. Bez niego zatrzymana strona wygląda na zawieszoną. */
+.hero__film {
+  position: absolute;
+  left: var(--gutter);
+  bottom: 2.5rem;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  pointer-events: none;
+  color: var(--mist);
+}
+.hero__film-tekst {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.hero__film-pasek {
+  display: block;
+  width: clamp(6rem, 18vw, 14rem);
+  height: 1px;
+  background: rgba(214, 205, 170, 0.28);
+  overflow: hidden;
+}
+.hero__film-pasek i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+
+/* ------------------------------------------------------------
+   4. ZESPÓŁ — kadr pod skalowanie
+   Zdjęcie rośnie w kadrze, kadr się nie rusza. Bez tej ramki
+   skalowanie rozpychałoby siatkę.
+   ------------------------------------------------------------ */
+.person__kadr {
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+  background: var(--haze);
+  /* Ten sam promień, co karty, kafle, karuzela i słupy grafiku — jedyne
+     ostre narożniki na stronie zostawały na zdjęciach zespołu. */
+  border-radius: 1rem;
+}
+.person__media { margin-bottom: 0; will-change: transform; }
+
+/* ------------------------------------------------------------
+   5. PÓŁKA — wyliczenie, po które się sięga
+   Grzbiet książki: numer, nazwa i schowany opis. Sięgnięcie (hover,
+   fokus, dotyk) wysuwa pozycję w bok i otwiera opis. Ruch poziomy,
+   bo tak wyjmuje się książkę; układ pionowy, bo to dalej lista.
+
+   Wysokość opisu i wysunięcie animuje ruch.js — tu są stany wyjściowe
+   i wersja bez skryptu, w której wszystkie opisy są widoczne.
+   ------------------------------------------------------------ */
+.polka {
+  margin: clamp(2.5rem, 5vw, 4rem) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+.polka__ksiazka { border-bottom: 1px solid var(--line); }
+.polka__grzbiet {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding: clamp(1.15rem, 2.2vw, 1.75rem) clamp(0.75rem, 1.5vw, 1.25rem);
+  text-decoration: none;
+  /* Tło i krawędź zostają CSS-owi (kolory), przesunięcie GSAP-owi. */
+  transition: background-color .45s var(--ruch-krzywa, ease);
+  will-change: transform;
+}
+/* Krawędź grzbietu — to ona grubieje i zmienia kolor, kiedy książka
+   się wysuwa. Pseudoelementu GSAP nie dosięgnie, więc sterowanie idzie
+   przez zmienną --grzbiet ustawianą tweenem na rodzicu. @property jest
+   tu konieczne: bez typu <number> przeglądarka traktuje zmienną jak
+   napis i interpolacja jest skokowa. */
+@property --grzbiet {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+.polka__grzbiet::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: calc(2px + var(--grzbiet, 0) * 4px);
+  background: color-mix(in srgb, var(--brass) calc(var(--grzbiet, 0) * 100%), var(--sage));
+}
+.polka__nr {
+  font-family: var(--font-display);
+  font-size: var(--step-small);
+  font-variant-numeric: tabular-nums;
+  color: var(--brass);
+  padding-top: 0.35em;
+}
+.polka__nazwa {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.375rem, 2.4vw, 1.875rem);
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--deep);
+}
+/* Opis siedzi w klatce o zerowej wysokości; wysokość otwiera GSAP.
+   Wewnętrzny <span> istnieje po to, żeby dało się zmierzyć docelową
+   wysokość bez chwilowego pokazywania treści. */
+.polka__opis {
+  display: block;
+  overflow: hidden;
+  height: 0;
+}
+.polka__opis > span {
+  display: block;
+  padding-top: 0.75rem;
+  max-width: 60ch;
+  font-size: var(--step-small);
+  line-height: 1.6;
+  color: var(--moss);
+}
+.polka__znak {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  color: var(--moss);
+  opacity: 0;
+}
+.polka__grzbiet:hover { background: color-mix(in srgb, var(--paper) 75%, transparent); }
+.polka__grzbiet:focus-visible { outline: 2px solid var(--brass); outline-offset: -2px; }
+
+/* Bez skryptu: żaden opis nie może zostać schowany. */
+html:not(.js-ruch) .polka__opis { height: auto; }
+@media (prefers-reduced-motion: reduce) {
+  .js-ruch .polka__opis { height: auto; }
+  .js-ruch .polka__znak { opacity: 1; }
+}
+
+/* ------------------------------------------------------------
+   6. GALERIA — lupa
+   Kadr, w który klikasz, sam rośnie do pełnego rozmiaru (Flip),
+   więc widać, skąd wyszedł i gdzie wróci.
+   ------------------------------------------------------------ */
+/* Kadr trzyma miejsce w siatce, zdjęcie w nim rośnie. Bez ramki
+   skalowanie rozpychałoby siatkę, a lupa nie miałaby gdzie wrócić. */
+.gallery__kadr {
+  margin: 0;
+  overflow: hidden;
+  background: var(--haze);
+}
+.lupa {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  background: rgba(16, 26, 22, 0.92);
+  opacity: 0;
+  visibility: hidden;
+}
+.lupa--otwarta { visibility: visible; }
+.lupa__kadr {
+  max-width: min(92vw, 1100px);
+  max-height: 86vh;
+}
+.lupa__kadr img {
+  display: block;
+  max-width: 100%;
+  max-height: 86vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+/* Strzałki w lupie: pełny kadr też się przekłada, bez wychodzenia
+   i wchodzenia z powrotem. Stoją przy krawędziach, poza zdjęciem —
+   na kadrze zasłaniałyby to, po co się go otwiera. */
+.lupa__strzalka {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3.25rem;
+  height: 3.25rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(214, 205, 170, 0.45);
+  border-radius: 50%;
+  background: rgba(16, 26, 22, 0.55);
+  color: var(--mist);
+  transition: border-color .35s var(--ruch-krzywa, ease),
+              background-color .35s var(--ruch-krzywa, ease);
+}
+.lupa__strzalka:hover {
+  border-color: var(--mist);
+  background: rgba(16, 26, 22, 0.85);
+}
+.lupa__strzalka--wstecz { left: clamp(0.75rem, 3vw, 2.5rem); }
+.lupa__strzalka--dalej { right: clamp(0.75rem, 3vw, 2.5rem); }
+.lupa__strzalka[hidden] { display: none; }
+/* Na wąskim ekranie strzałki schodzą pod kadr — przy krawędziach
+   zasłaniałyby zdjęcie, które zajmuje prawie całą szerokość. */
+@media (max-width: 34rem) {
+  .lupa__strzalka { top: auto; bottom: 1.25rem; transform: none; }
+  .lupa__strzalka--wstecz { left: 25%; }
+  .lupa__strzalka--dalej { right: 25%; }
+}
+.lupa__zamknij {
+  position: absolute;
+  top: clamp(1rem, 3vw, 2rem);
+  right: clamp(1rem, 3vw, 2rem);
+  background: none;
+  border: 1px solid rgba(214, 205, 170, 0.45);
+  border-radius: 100px;
+  color: var(--mist);
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.6rem 1.2rem;
+}
+.lupa__zamknij:hover { background: var(--mist); color: var(--ink); }
+
+/* ------------------------------------------------------------
+   6b. KARUZELA ZDJĘĆ — coverflow
+
+   JEDNA forma na wszystkie zbiory zdjęć: zespół, gabinety, kadry
+   z zabiegów i galeria. Wcześniej były trzy — wachlarz, harmonijka
+   i siatka — więc ta sama rzecz wyglądała na każdej stronie inaczej.
+
+   Karty stoją na jednej osi i cofają się w głąb: środkowa patrzy
+   prosto, boczne odchylają się i oddalają. Odchylenie NIE rośnie
+   liniowo z odległością — idzie przez `odległość^0,56`, więc druga
+   karta nie składa się na płasko i dalej widać, co na niej jest.
+
+   Pierścień jest zamknięty: karta odsunięta o więcej niż pół obiegu
+   przeskakuje na drugą stronę. Żadnych klonów w znacznikach — każde
+   zdjęcie stoi w kodzie dokładnie raz, także w galerii z dwudziestoma.
+
+   PRÓBOWANE, WYCOFANE: wachlarz — karty nachodzące na siebie w łuku.
+   Pokazywał wszystkie kadry naraz, ale każdy po kawałku, a wysunięcie
+   jednej karty wymagało najechania: na dotyku nie ma czym najechać,
+   więc na telefonie wachlarz w ogóle się nie otwierał.
+
+   Tu jest tylko pudełko i wygląd pojedynczej karty. Przesunięcia,
+   obroty, głębię i krycie liczy ruch.js (`zbudujKaruzele`).
+   ------------------------------------------------------------ */
+.karuzela {
+  /* Szerokość karty jest jedynym wymiarem podanym z ręki — wysokość,
+     odstęp, głębia i perspektywa liczą się z niej, więc cały efekt
+     skaluje się razem z nią. */
+  --kf-karta: clamp(13rem, 30vw, 28rem);
+  --kf-proporcja: 1.5;            /* szerokość ÷ wysokość kadru */
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+/* Stan wyjściowy to zwykła siatka. Bez JS i przy prefers-reduced-motion
+   ona zostaje: wszystkie kadry naraz, nic do przegapienia, zero ruchu. */
+.karuzela__tor {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+}
+.karuzela__karta {
+  position: relative;
+  margin: 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: var(--haze);
+  box-shadow: 0 0.75rem 2rem rgba(16, 26, 22, 0.24);
+}
+.karuzela__karta::after {
+  /* Cienka jasna krawędź — bez niej karty zachodzące na siebie
+     zlewają się w jedną plamę. */
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(251, 250, 245, 0.55);
+  pointer-events: none;
+}
+.karuzela__karta img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: var(--kf-proporcja);
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* Podpis siedzi w znacznikach dla czytnika ekranu, ale NIE na zdjęciu:
+   napis w poprzek kadru zasłania dokładnie to, po co się na kadr patrzy.
+   Wersja widoczna stoi pod karuzelą, jedna dla całego zbioru. */
+.karuzela__podpis {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* ---------- tryb coverflow (klasę dokłada ruch.js) ---------- */
+.karuzela--gra .karuzela__scena {
+  position: relative;
+  /* W pionie luz na cienie, w poziomie przycięcie: karty z drugiej
+     strony pierścienia nie mogą wychodzić poza kolumnę tekstu. */
+  padding-block: clamp(1.5rem, 3vw, 2.75rem);
+  overflow: hidden;
+  perspective: calc(var(--kf-karta) * 3);
+  /* Przeciąganie w bok jest nasze; pionowe przewijanie strony zostaje
+     przeglądarce, więc karuzela nie blokuje czytania. */
+  touch-action: pan-y;
+}
+.karuzela--gra .karuzela__scena:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 4px;
+  border-radius: 1rem;
+}
+.karuzela--gra .karuzela__tor {
+  position: relative;
+  display: block;
+  height: calc(var(--kf-karta) / var(--kf-proporcja));
+  transform-style: preserve-3d;
+  user-select: none;
+}
+.karuzela--gra .karuzela__karta {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: var(--kf-karta);
+  box-shadow: 0 1rem 2.5rem rgba(16, 26, 22, 0.32);
+  will-change: transform, opacity;
+}
+.karuzela--gra .karuzela__karta img { height: 100%; }
+
+/* ---------- portrety ----------
+   Zespół idzie w kadrze pionowym. W 3:2 twarz trzeba było przyciąć
+   albo w brodę, albo we włosy — jedno i drugie widać. */
+.karuzela--postac {
+  --kf-proporcja: 0.78;
+  --kf-karta: clamp(10rem, 19vw, 17rem);
+}
+
+/* ---------- sterowanie ----------
+   Strzałki i licznik dokłada ruch.js: bez skryptu nie miałyby czym
+   sterować, więc nie ma ich w znacznikach. Poprzednia talia miała je
+   wpisane na stałe i nie były podpięte do niczego — klikało się w nic. */
+.karuzela__ster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+.karuzela__btn {
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--deep);
+  transition: border-color .35s var(--ruch-krzywa, ease),
+              background-color .35s var(--ruch-krzywa, ease);
+}
+.karuzela__btn:hover {
+  border-color: var(--deep);
+  background: color-mix(in srgb, var(--deep) 7%, transparent);
+}
+.karuzela__licznik {
+  margin: 0;
+  min-width: 4.5rem;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: var(--step-small);
+  font-variant-numeric: tabular-nums;
+  color: var(--moss);
+}
+/* Jedna linia podpisu pod całą karuzelą, zmieniana przy przekładaniu. */
+.karuzela__opis {
+  display: grid;
+  gap: 0.2rem;
+  margin: 1.25rem 0 0;
+  min-height: 3rem;
+  text-align: center;
+}
+.karuzela__opis b {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 400;
+  color: var(--deep);
+}
+.karuzela__opis span {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+/* ------------------------------------------------------------
+   7. FINAŁ — mgła zamiast sceny 3D
+   Dwie warstwy w bardzo wolnym, przeciwbieżnym ruchu. Kreska pod
+   nagłówkiem dorysowuje się przy dojściu do kadru.
+   ------------------------------------------------------------ */
+.finale__mgla {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.finale__mgla span {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  filter: blur(40px);
+  will-change: transform;
+}
+.finale__mgla-1 {
+  width: 70vw;
+  height: 42vw;
+  right: -12vw;
+  top: -8vw;
+  background: radial-gradient(ellipse at center, rgba(206, 210, 190, 0.16), transparent 68%);
+}
+.finale__mgla-2 {
+  width: 60vw;
+  height: 36vw;
+  left: -10vw;
+  bottom: -12vw;
+  background: radial-gradient(ellipse at center, rgba(138, 111, 57, 0.18), transparent 70%);
+}
+.finale__kreska {
+  display: block;
+  width: min(28rem, 60%);
+  height: 2px;
+  margin: 2rem 0 0;
+  color: var(--brass);
+  overflow: visible;
+}
+
+/* ------------------------------------------------------------
+   8. STANY — hover i fokus
+   Ta sama krzywa co reszta systemu, połowa czasu. Wyliczone
+   właściwości zamiast `all`: `all` łapie width/height i wywołuje
+   reflow na każdym hoverze.
+   ------------------------------------------------------------ */
+a,
+.btn,
+.gallery img,
+.kal__tresc {
+  transition-property: color, background-color, border-color, opacity, box-shadow;
+  transition-duration: calc(var(--ruch-czas) / 2);
+  transition-timing-function: var(--ruch-krzywa);
+}
+/* Przyciski przyciągane kursorem — transform należy do GSAP, więc
+   CSS nie ma prawa go ruszać (dwa systemy na jednej właściwości to
+   zawsze skok). */
+.btn--magnes { will-change: transform; }
+
+/* ------------------------------------------------------------
+   9. SPOKÓJ (prefers-reduced-motion)
+   Bez blokady hero, bez pasa w ruchu, bez rozbijania nagłówków.
+   Strona zostaje kompletna i statyczna.
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .js-ruch [data-rozbij] { visibility: visible; }
+  .js-ruch .hero__film { display: none; }
+  * { scroll-behavior: auto !important; }
+}
+
+/* ------------------------------------------------------------
+   10. PORÓWNANIE PRZED / PO
+   Dwa kadry tego samego przypadku leżały obok siebie; różnicę
+   trzeba było znaleźć samemu, przeskakując wzrokiem. Nałożone na
+   siebie i rozsuwane uchwytem pokazują ją w jednym miejscu.
+
+   Przycięcie idzie przez zmienną --x, żeby GSAP mógł ją tweenować
+   (klawiatura) i ustawiać na bieżąco (przeciąganie). @property jest
+   konieczne: bez typu <percentage> przeglądarka interpoluje skokowo.
+   ------------------------------------------------------------ */
+@property --x {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 50%;
+}
+.porownanie { margin: 0; }
+.porownanie__kadr {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: var(--haze);
+  aspect-ratio: 3 / 2;
+  --x: 50%;
+  touch-action: pan-y;      /* pionowe przewijanie strony zostaje */
+}
+.porownanie__po,
+.porownanie__przed { position: absolute; inset: 0; }
+.porownanie__przed { clip-path: inset(0 calc(100% - var(--x)) 0 0); }
+.porownanie img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.porownanie__uchwyt {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--x);
+  width: 3rem;
+  margin-left: -1.5rem;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+}
+.porownanie__linia {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--paper);
+  box-shadow: 0 0 1rem rgba(16, 26, 22, 0.45);
+}
+.porownanie__lapka {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--deep);
+  box-shadow: 0 0.5rem 1.5rem rgba(16, 26, 22, 0.35);
+}
+.porownanie__uchwyt:focus-visible { outline: none; }
+.porownanie__uchwyt:focus-visible .porownanie__lapka {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+}
+.porownanie__znak {
+  position: absolute;
+  top: 1rem;
+  margin: 0;
+  padding: 0.35rem 0.8rem;
+  border-radius: 100px;
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: rgba(16, 26, 22, 0.6);
+  color: var(--paper);
+  pointer-events: none;
+}
+.porownanie__znak--przed { left: 1rem; }
+.porownanie__znak--po { right: 1rem; }
+
+/* ------------------------------------------------------------
+   11. MENU NA WĄSKIM EKRANIE
+   Pasek poziomy chowa się poniżej 62rem i do tej pory nie zostawiał
+   po sobie nic — telefon miał logotyp i jeden przycisk. Panel zajmuje
+   cały ekran, bo na telefonie nawigacja jest zadaniem, a nie ozdobą:
+   pięć pozycji dużym pismem, numerowane, plus telefon na dole.
+   ------------------------------------------------------------ */
+.menu-btn {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+}
+@media (min-width: 62rem) { .menu-btn { display: none; } }
+.menu-btn__kreski {
+  display: grid;
+  gap: 5px;
+  width: 1rem;
+}
+.menu-btn__kreski i {
+  display: block;
+  height: 1px;
+  background: currentColor;
+  /* Obie kreski jadą transformem (GSAP), więc mają własny punkt obrotu. */
+  transform-origin: 50% 50%;
+}
+
+.menu-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(2rem, 8vh, 4rem);
+  padding: 6rem var(--gutter) 3rem;
+  background: var(--deep);
+  color: var(--sky);
+  /* Stan wyjściowy: panel jest w DOM, ale `hidden` do momentu otwarcia —
+     dzięki temu czytnik ekranu nie czyta go dwa razy razem z paskiem. */
+}
+/* `hidden` MUSI tu wygrać jawnie. Atrybut `hidden` to reguła arkusza
+   przeglądarki (`display: none`), a każda reguła autorska ją bije — więc
+   `display: flex` powyżej sprawiało, że panel na pełny ekran (zieleń,
+   złote numery 01–05) był widoczny od pierwszej klatki aż do chwili,
+   w której ruch.js zdążył go schować GSAP-em. Na wolniejszym łączu to
+   ćwierć sekundy cudzego ekranu przy każdym wejściu na podstronę. */
+.menu-panel[hidden] { display: none; }
+.menu-panel__spis { display: grid; }
+.menu-panel__spis a {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(206, 210, 190, 0.18);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 9vw, 3rem);
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--paper);
+  text-decoration: none;
+}
+.menu-panel__nr {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.14em;
+  color: var(--brass);
+}
+.menu-panel__spis a[aria-current] .menu-panel__nr { color: var(--mist); }
+.menu-panel__stopka {
+  display: grid;
+  gap: 0.35rem;
+  font-size: var(--step-small);
+  color: var(--haze);
+}
+.menu-panel__stopka a {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  color: var(--paper);
+  text-decoration: none;
+}
+.menu-panel__stopka p { margin: 0; }
+
+/* Przycisk „Umów wizytę" łamał się na dwa wiersze przy 390 px i rozpychał
+   pasek. Na wąskim ekranie schodzi o stopień i traci światła — treść ta sama,
+   jeden wiersz. */
+@media (max-width: 30rem) {
+  .masthead .btn {
+    padding: 0.7rem 1rem;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+  .masthead__inner { gap: 0.75rem; }
+  .masthead__aside { gap: 0.6rem; }
+}
+
+/* ------------------------------------------------------------
+   13. KURSOR
+   Jeden wektor w `cursor: url(...)`, nie skrypt jeżdżący za myszą.
+   Strzałka w kolorze --ink z obrysem --paper: czytelna i na kremowym
+   tle, i na ciemnej zieleni hero, bez przełączania wariantów.
+
+   PRÓBOWANE, WYCOFANE: pierścień z kropką sterowany GSAP-em. Wymagał
+   ukrycia systemowego kursora (`cursor: none`), przy szybkim ruchu myszy
+   zawsze był o klatkę z tyłu, a na elementach, które przeglądarka i tak
+   obsługuje sama (pola tekstowe, zaznaczanie), odbierał informację
+   zamiast ją dodawać. Dźwięk kliknięcia został — robi go ruch.js.
+
+   Dwa warianty i ani jednego więcej. Żeby to była prawda, a nie zamiar,
+   `*` dziedziczy kursor po rodzicu z `!important`: rączka, lupa, belka
+   tekstu i strzałki zmiany rozmiaru wracały wcześniej z arkuszy
+   wczytywanych PO tym pliku (usluga.css, grafik.css, park.css), gdzie
+   `cursor: pointer` przy przycisku wygrywał kolejnością. Deklaracje
+   stamtąd są usunięte, a ta reguła pilnuje, żeby nie wróciły.
+   ------------------------------------------------------------ */
+*, *::before, *::after { cursor: inherit !important; }
+html { cursor: url("data:image/svg+xml,%3Csvg%20width%3D%2228%22%20height%3D%2228%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5.08814%205.36283L10.4791%2020.7254C10.781%2021.5857%2011.9824%2021.6263%2012.3417%2020.7884L15.0192%2014.5442C15.1203%2014.3083%2015.3083%2014.1203%2015.5442%2014.0192L21.7884%2011.3417C22.6263%2010.9824%2022.5857%209.78096%2021.7254%209.47907L6.36285%204.08812C5.57154%203.81044%204.81046%204.57152%205.08814%205.36283Z%22%20fill%3D%22%23101a16%22%20stroke%3D%22%23fbfaf5%22%20stroke-width%3D%222.05556%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E") 5 4, default !important; }
+/* Nad tym, co klikalne, strzałka nie zmienia się w rączkę — rośnie.
+   Rączka jest znakiem systemowym i wygląda jak wtręt z innej strony;
+   powiększenie tej samej strzałki mówi to samo, nie zmieniając języka.
+   To jedyne dwa warianty kursora na całej stronie. */
+a, button, [role="button"], summary,
+.karuzela__karta, .karuzela__scena, .grafik__osoba-btn,
+.park__kamien--lista li,
+.zabiegi > li, .wybor__karta, .polka__grzbiet {
+  cursor: url("data:image/svg+xml,%3Csvg%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5.08814%205.36283L10.4791%2020.7254C10.781%2021.5857%2011.9824%2021.6263%2012.3417%2020.7884L15.0192%2014.5442C15.1203%2014.3083%2015.3083%2014.1203%2015.5442%2014.0192L21.7884%2011.3417C22.6263%2010.9824%2022.5857%209.78096%2021.7254%209.47907L6.36285%204.08812C5.57154%203.81044%204.81046%204.57152%205.08814%205.36283Z%22%20fill%3D%22%23101a16%22%20stroke%3D%22%23fbfaf5%22%20stroke-width%3D%222.05556%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E") 7 6, default !important;
+}

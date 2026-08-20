@@ -1,0 +1,1774 @@
+/* ============================================================
+   DentalPark — szkielet strony
+   Etap: struktura + typografia. Bez animacji, bez efektów.
+   Paleta wyprowadzona z klatek Hero mp4 (ffmpeg, próbki regionów).
+   ============================================================ */
+
+:root {
+  /* --- kolory: próbki z hero.mp4 --- */
+  --ink:    #101a16;  /* cień pod koroną drzewa */
+  --deep:   #1a3631;  /* głębia wody — kolor wiodący */
+  --moss:   #4b5b4d;  /* odbicie liści w tafli */
+  --sage:   #8b9a86;  /* liście w słońcu */
+  --haze:   #ced2be;  /* tafla wody */
+  --brass:  #8a6f39;  /* mgła w słońcu, przyciemniona do kontrastu 4.6:1 */
+  --mist:   #d6cdaa;  /* mgła w słońcu, wersja jasna */
+  --sky:    #e6eadc;  /* niebo o świcie */
+  --cream:  #f2f1e8;
+  --paper:  #fbfaf5;
+  --line:   #ddddd0;
+
+  /* --- typografia --- */
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-text: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --step-display: clamp(2.75rem, 6.5vw, 5.75rem);
+  --step-h1:      clamp(2.25rem, 5vw, 4rem);
+  --step-h2:      clamp(1.875rem, 3.6vw, 3rem);
+  --step-h3:      clamp(1.25rem, 1.9vw, 1.625rem);
+  --step-lead:    clamp(1.0625rem, 1.5vw, 1.3125rem);
+  --step-body:    1.0625rem;
+  --step-small:   0.875rem;
+  --step-eyebrow: 0.75rem;
+
+  /* --- rytm --- */
+  --gutter:  clamp(1.25rem, 5vw, 4rem);
+  /* Odstęp między sekcjami był ustawiony pod stronę czytaną kartka po
+     kartce: przy 1440 px dawał 144 px u góry i tyle samo u dołu, czyli
+     prawie jedna trzecia ekranu pustej kolumny między dwoma zdaniami.
+     Zejście do 6.5rem trzyma oddech, ale mieści w kadrze koniec jednej
+     sekcji i początek następnej — pacjent widzi, że strona idzie dalej. */
+  --section: clamp(3.5rem, 6vw, 6.5rem);
+  --max:     1240px;
+  --max-prose: 68ch;
+}
+
+/* ---------- reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+/* stabilna rynna na pasek: blokada scrolla na czas animacji hero
+   nie może przesuwać układu w bok */
+/* scroll-behavior i scrollbar-gutter zdjęte razem z dawną blokadą hero:
+   przewijaniem zajmuje się ScrollSmoother, a blokada nie rusza już
+   overflow, więc nie ma czego stabilizować. */
+html { -webkit-text-size-adjust: 100%; }
+body, h1, h2, h3, h4, p, figure, blockquote, dl, dd, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+img, video { display: block; max-width: 100%; height: auto; }
+button, input, textarea { font: inherit; color: inherit; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: var(--step-body);
+  font-weight: 400;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- typografia ---------- */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-variation-settings: 'SOFT' 20, 'WONK' 0;
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  color: var(--deep);
+  text-wrap: balance;
+}
+h1 { font-size: var(--step-h1); }
+h2 { font-size: var(--step-h2); }
+h3 { font-size: var(--step-h3); font-weight: 400; line-height: 1.25; }
+h4 {
+  font-family: var(--font-text);
+  font-size: var(--step-body);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+
+p { max-width: var(--max-prose); text-wrap: pretty; }
+
+.eyebrow {
+  font-family: var(--font-text);
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 1.25rem;
+}
+
+.lead {
+  font-size: var(--step-lead);
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--moss);
+}
+
+.small { font-size: var(--step-small); }
+
+a { color: var(--deep); text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+a:hover { color: var(--brass); }
+
+strong, b { font-weight: 600; }
+
+/* ---------- układ ---------- */
+.wrap {
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.section { padding-block: var(--section); }
+/* sticky masthead zasłania cel kotwicy */
+section[id], [id] { scroll-margin-top: 5.5rem; }
+.section--tight { padding-block: calc(var(--section) * 0.6); }
+.section--cream { background: var(--cream); }
+/* --brass daje 4.20:1 na --cream, a nadtytuł i indeks są małe (12 i 14 px),
+   więc obowiązuje próg 4.5. Na kremie schodzą na --moss (6.38:1).
+   Tabela par: node park/_praca/kontrast.mjs */
+.section--cream .eyebrow,
+.section--cream .card__index,
+.section--cream .card__more { color: var(--moss); }
+/* Znak „Po" jest bursztynowy właśnie po to, żeby różnił się od „Przed"
+   (K5 V.2). Na kremie bursztyn nie przechodzi, ale zrównanie obu znaków na
+   --moss kasowałoby rozróżnienie, czyli całą robotę tego znaku. Zamiast tego
+   „Po" idzie na --deep (11.46:1): dalej inny niż „Przed", dalej czytelny. */
+.section--cream .przedpo__znak--po { color: var(--deep); }
+.section--deep { background: var(--deep); color: var(--sky); }
+.section--deep h1, .section--deep h2, .section--deep h3 { color: var(--sky); }
+.section--deep .eyebrow { color: var(--mist); }
+.section--deep .lead { color: var(--haze); }
+.section--deep a:not(.btn) { color: var(--mist); }
+
+.section-head { margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.section-head p { margin-top: 1.25rem; }
+
+.split {
+  display: grid;
+  gap: clamp(2rem, 5vw, 5rem);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 62rem) {
+  /* `center`, nie `start`: kolumna z nagłówkiem jest zwykle o połowę
+     krótsza od kolumny z treścią, a przy wyrównaniu do góry cała różnica
+     zbierała się w jedną dziurę pod nagłówkiem. Wyśrodkowana dzieli tę
+     samą różnicę na dwa mniejsze marginesy i czyta się jako odstęp, a nie
+     jako brak. */
+  .split { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: center; }
+  .split--even { grid-template-columns: 1fr 1fr; }
+  /* Nagłówek sekcji zostaje w kadrze, kiedy czyta się długą kolumnę obok. */
+  .split--lepki > *:first-child { position: sticky; top: 7rem; }
+}
+
+.prose > * + * { margin-top: 1.25rem; }
+.prose h2 { margin-top: 2.75rem; }
+.prose h3 { margin-top: 2.25rem; }
+.prose ul { max-width: var(--max-prose); }
+.prose li {
+  padding-left: 1.5rem;
+  position: relative;
+  margin-top: 0.625rem;
+}
+.prose li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.75em;
+  width: 0.5rem;
+  height: 1px;
+  background: var(--brass);
+}
+/* Kreska jest znakiem punktu listy w prozie. Karty wyboru i znaczki to
+   nie punkty listy, tylko osobne elementy, które akurat siedzą w <ul> —
+   przy nich kreska wyglądała jak zabłąkany myślnik obok kafelka. */
+.prose :is(.wybor, .znaczki, .zabiegi) > li { padding-left: 0; }
+.prose :is(.wybor, .znaczki, .zabiegi) > li::before { display: none; }
+
+/* ---------- przyciski ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--step-small);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 0.875rem 1.75rem;
+  border: 1px solid var(--deep);
+  border-radius: 100px;
+  text-decoration: none;
+  background: var(--deep);
+  color: var(--paper);
+}
+.btn:hover { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.btn--ghost { background: transparent; color: var(--deep); }
+.btn--ghost:hover { background: var(--deep); color: var(--paper); }
+.btn--light { background: var(--paper); border-color: var(--paper); color: var(--deep); }
+.btn--light:hover { background: var(--mist); border-color: var(--mist); color: var(--ink); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+
+/* ---------- nagłówek strony ----------
+   `fixed`, nie `sticky`: pasek stoi poza #smooth-wrapper, bo ScrollSmoother
+   przesuwa zawartość transformem i sticky nie miałby względem czego się
+   kleić. Dzięki temu jest też odporny na blokadę przewijania w hero —
+   menu działa, kiedy strona stoi.
+
+   Dwa stany. Nad filmem pasek jest przezroczysty i jasny (klasa domyślna),
+   od pierwszej sekcji poniżej wjeżdża tło --paper i ciemne pismo
+   (`.masthead--zwarty`, przełącza ruch.js). */
+.masthead {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  color: var(--paper);
+}
+/* Przyciemnienie pod samym paskiem. Bez niego menu leżało wprost na kadrze
+   i przy przewijaniu wjeżdżał pod nie jasny tekst hero — dwa jasne pisma
+   jedno na drugim, nie do odczytania. Gradient schodzi do zera, więc nie
+   robi krawędzi; znika razem z pojawieniem się tła (.masthead--zwarty). */
+.masthead::before {
+  content: '';
+  position: absolute;
+  inset: -1px 0 auto 0;
+  height: 8.5rem;
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(16, 26, 22, 0.72) 0%,
+    rgba(16, 26, 22, 0.45) 38%,
+    rgba(16, 26, 22, 0.16) 68%,
+    rgba(16, 26, 22, 0) 100%);
+  transition: opacity .5s var(--ruch-krzywa, ease);
+}
+.masthead--zwarty::before { opacity: 0; }
+.masthead__inner, .masthead__postep { position: relative; }
+.masthead__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-block: 1rem;
+}
+.masthead--zwarty {
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(10px) saturate(120%);
+  border-bottom-color: var(--line);
+  color: var(--ink);
+}
+.logo {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--deep);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.logo span { color: var(--brass); }
+.masthead .logo { color: currentColor; }
+.masthead--zwarty .logo { color: var(--deep); }
+.nav { display: none; gap: 2rem; }
+.nav a {
+  font-size: var(--step-small);
+  text-decoration: none;
+  color: currentColor;
+  opacity: 0.78;
+  /* Klatka dla przesuwanego napisu: przy najechaniu stara etykieta wyjeżdża
+     w górę, kopia wjeżdża od dołu (ruch.js robi kopię i tween). */
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  line-height: 1.35;
+}
+.nav a:hover, .nav a[aria-current] { opacity: 1; }
+.masthead--zwarty .nav a { color: var(--moss); }
+.masthead--zwarty .nav a:hover,
+.masthead--zwarty .nav a[aria-current] { color: var(--deep); }
+.nav a > span { display: inline-block; }
+.masthead__aside { display: flex; align-items: center; gap: 1.5rem; }
+.masthead__tel {
+  display: none;
+  font-size: var(--step-small);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  color: currentColor;
+}
+/* Nad filmem przycisk musi być czytelny na jasnej tafli, więc na starcie
+   jedzie w wersji „na wodzie"; po zwarciu paska wraca do wypełnienia. */
+.masthead:not(.masthead--zwarty) .btn {
+  background: transparent;
+  border-color: rgba(251, 250, 245, 0.55);
+  color: var(--paper);
+}
+.masthead:not(.masthead--zwarty) .btn:hover {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--deep);
+}
+/* Pasek postępu czytania — jedna kreska pod paskiem nawigacji. */
+.masthead__postep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  pointer-events: none;
+}
+.masthead__postep i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(to right, var(--brass), var(--mist));
+}
+@media (min-width: 62rem) {
+  .nav { display: flex; }
+  .masthead__tel { display: inline; }
+}
+/* Siedem pozycji w pasku mieści się dopiero od ok. 1200 px. Niżej pasek
+   zawijał się na dwa wiersze i rósł z 85 do 109 px — więc na tym zakresie
+   odstępy schodzą, zamiast łamać układ. Numer telefonu ustępuje pierwszy:
+   ten sam numer stoi w przycisku obok i w stopce. */
+@media (min-width: 62rem) and (max-width: 78rem) {
+  .masthead__inner { gap: 1.25rem; }
+  .nav { gap: 1.15rem; }
+  .masthead__aside { gap: 0.9rem; }
+  .masthead__tel { display: none; }
+}
+
+/* ---------- hero ----------
+   Wysokość dokładnie jednego ekranu: film jest jedynym wydarzeniem aktu I,
+   a w czasie jego trwania strona i tak stoi (blokada przewijania z ruch.js).
+   Rozciąganie sekcji na 2,2 ekranu straciło sens razem z przewijanym
+   zanurzeniem — dziś zanurzenie jest w samym filmie. */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  background: var(--deep);
+}
+/* Bez maski u dołu: ostatnia klatka filmu to płaska zieleń w kolorze --deep,
+   więc kadr sam domyka się kolorem. Maska rozjaśniałaby dolny pas do koloru
+   tła strony i robiła szew w połowie zanurzenia. */
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.hero__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Dwa gradienty: od lewej pod kolumnę tekstu, od dołu pod pasek z adresem.
+   Prawa strona kadru zostaje czysta — tam wisi ząb. */
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  /* Przyciemnienie trzyma pełną moc na całej szerokości kolumny tekstu, a nie
+     tylko przy samej krawędzi. Poprzednie schodziło do 0.62 już na 32%, czyli
+     w połowie nadtytułu i zdania prowadzącego — a tam pod spodem jest tafla
+     wody, najjaśniejsze miejsce całego filmu. Zmierzone w pikselach: nadtytuł
+     wychodził 3.52:1, zdanie prowadzące 2.98:1, wiersz z telefonem 3.67:1,
+     przy progu 4.5. Bramka: node park/_praca/kontrast.mjs */
+  /* Poprzednia wersja schodziła z 0.88 na 0.12 na odcinku 40 procent
+     szerokości — oko widziało to jako pionowy szew w połowie kadru:
+     lewa strona przyciemniona, prawa rozjaśniona, między nimi krawędź.
+     Teraz spadek jest rozłożony na dziewięć przystanków i zaczyna się
+     wcześniej, więc nie ma miejsca, w którym „coś się zmienia". */
+  background:
+    linear-gradient(to right,
+      rgba(16, 26, 22, 0.88) 0%,
+      rgba(16, 26, 22, 0.86) 18%,
+      rgba(16, 26, 22, 0.80) 32%,
+      rgba(16, 26, 22, 0.70) 44%,
+      rgba(16, 26, 22, 0.56) 55%,
+      rgba(16, 26, 22, 0.40) 65%,
+      rgba(16, 26, 22, 0.24) 75%,
+      rgba(16, 26, 22, 0.10) 85%,
+      rgba(16, 26, 22, 0) 96%),
+    linear-gradient(to top,
+      rgba(16, 26, 22, 0.84) 0%,
+      rgba(16, 26, 22, 0.70) 16%,
+      rgba(16, 26, 22, 0.52) 30%,
+      rgba(16, 26, 22, 0.34) 44%,
+      rgba(16, 26, 22, 0.18) 58%,
+      rgba(16, 26, 22, 0.07) 70%,
+      rgba(16, 26, 22, 0) 82%);
+}
+/* Przycisk na wodzie: obrys zamiast wypełnienia, bo pod nim jest film, a nie
+   płaskie tło. Było to inline'owym `style` w index.html. */
+.btn--na-wodzie {
+  background: transparent;
+  border-color: rgba(251, 250, 245, 0.5);
+  color: var(--paper);
+}
+.btn--na-wodzie:hover {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--deep);
+}
+
+.hero__inner {
+  position: relative;
+  padding-block: clamp(3rem, 7vw, 6rem);
+  width: 100%;
+}
+.hero h1 {
+  font-size: var(--step-display);
+  color: var(--paper);
+  max-width: 16ch;
+}
+.hero .eyebrow { color: var(--mist); }
+.hero .lead { color: var(--sky); max-width: 44ch; margin-top: 1.5rem; }
+.hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(251, 250, 245, 0.22);
+  font-size: var(--step-small);
+  color: var(--haze);
+  /* Wiersz rejestracji rozciągał się flexem na całą szerokość hero i wchodził
+     prawą krawędzią na jasną taflę, gdzie schodził do 4.11:1. Rozjaśnienie
+     tekstu pogorszyłoby sprawę — jasny tekst psuje się właśnie na jasnym tle —
+     więc wiersz zostaje w kolumnie, w której stoi cała reszta bloku. */
+  max-width: min(100%, 42rem);
+}
+.hero__meta a { color: var(--haze); }
+
+/* ---------- fakty ---------- */
+/* Siatka trzyma się tej samej kolumny co reszta strony — pierwsza liczba
+   musi stać w jednej linii z nagłówkami sekcji. */
+.facts {
+  display: grid;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  border-block: 1px solid var(--line);
+}
+@media (min-width: 48rem) { .facts { grid-template-columns: repeat(4, 1fr); } }
+.fact { padding: 2.25rem 2rem; border-left: 1px solid var(--line); }
+.fact:first-child { border-left: 0; padding-left: 0; }
+@media (max-width: 47.99rem) {
+  .fact { border-left: 0; border-top: 1px solid var(--line); padding-inline: 0; }
+  .fact:first-child { border-top: 0; }
+}
+.fact dt {
+  /* Blok skalowany od lewej krawędzi rozpycha stronę: `dt` jako element
+     blokowy ma szerokość całej kolumny, więc przy wejściowym `scale: 1.22`
+     jego pudełko wychodziło 57 px poza kadr telefonu i przeglądarka
+     zmniejszała całą stronę z 390 do 448 px. Pudełko obejmuje teraz samą
+     liczbę. */
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--deep);
+}
+.fact dd {
+  margin: 0.75rem 0 0;
+  font-size: var(--step-small);
+  color: var(--moss);
+}
+
+/* ---------- karty usług ---------- */
+.cards {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 40rem) { .cards { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 64rem) { .cards { grid-template-columns: repeat(3, 1fr); } }
+
+.card { display: flex; flex-direction: column; }
+
+/* Wariant bez zdjęcia — używany na stronie głównej, dopóki nie ma nowej sesji.
+   Numer porządkowy trzyma rytm siatki tam, gdzie normalnie byłby kadr. */
+.card--type {
+  border-top: 1px solid var(--line);
+  padding-top: 1.5rem;
+}
+.card__index {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--brass);
+  margin-bottom: 2.5rem;
+}
+.card__media {
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--haze);
+  margin-bottom: 1.5rem;
+}
+.card__media img { width: 100%; height: 100%; object-fit: cover; }
+.card h3 a { text-decoration: none; }
+.card p {
+  margin-top: 0.875rem;
+  font-size: var(--step-small);
+  color: var(--moss);
+  line-height: 1.65;
+}
+.card__more {
+  margin-top: 1.25rem;
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--brass);
+}
+
+/* ---------- zespół ---------- */
+.team {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+.person__media {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: top center;
+  background: var(--haze);
+  margin-bottom: 1.25rem;
+}
+.person h3 { font-size: 1.25rem; }
+.person__role {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-top: 0.5rem;
+}
+.person__hours {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-size: var(--step-small);
+  color: var(--moss);
+}
+.person__hours li + li { margin-top: 0.25rem; }
+
+/* ---------- galeria ---------- */
+.gallery {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+}
+.gallery img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--haze); }
+.gallery--pairs { grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); }
+
+/* ---------- ścieżka usług ----------
+   Sześć specjalizacji jako przystanki na jednej ścieżce, nie jako sześć
+   identycznych kafelków. Kafelki byłyby tu najgorszym wyborem: powtarzalna
+   siatka ikona-nagłówek-tekst to najczęstszy odruch generatora, a treść i tak
+   jest listą — a lista z mocną typografią czyta się szybciej niż siatka.
+
+   Kreska po lewej to ta sama nitka, która schodzi przez całą stronę.
+   Kropka przy najechaniu wypełnia się mosiądzem — przystanek, przy którym
+   właśnie stoisz. */
+.sciezka {
+  list-style: none;
+  margin: clamp(2.5rem, 5vw, 4rem) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.sciezka__link {
+  display: grid;
+  gap: 0.5rem clamp(1.5rem, 4vw, 3.5rem);
+  padding: clamp(1.5rem, 2.6vw, 2.25rem) 0 clamp(1.5rem, 2.6vw, 2.25rem) 2.25rem;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  position: relative;
+}
+/* Asymetria 5/7 zamiast połowy na połowę — nazwa dostaje mniej miejsca niż
+   opis, więc kolumny nie wyglądają jak tabela. */
+@media (min-width: 52rem) {
+  .sciezka__link { grid-template-columns: 5fr 7fr; align-items: baseline; }
+}
+/* Pionowa kreska ścieżki. Rysowana na liście, nie na wierszu, żeby biegła
+   bez przerw między przystankami. */
+.sciezka { position: relative; }
+.sciezka::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+.sciezka__link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: calc(clamp(1.5rem, 2.6vw, 2.25rem) + 0.55em);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--sage);
+  background: var(--cream);
+  transition: background-color .4s var(--ruch-krzywa, ease), border-color .4s var(--ruch-krzywa, ease), transform .4s var(--ruch-krzywa, ease);
+}
+.sciezka__nazwa {
+  font-size: clamp(1.375rem, 2.4vw, 1.875rem);
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--deep);
+  transition: color .4s var(--ruch-krzywa, ease);
+}
+.sciezka__opis {
+  margin: 0;
+  max-width: 52ch;
+  font-size: var(--step-small);
+  line-height: 1.6;
+  color: var(--moss);
+}
+.sciezka__link:hover .sciezka__nazwa,
+.sciezka__link:focus-visible .sciezka__nazwa { color: var(--brass); }
+.sciezka__link:hover::before,
+.sciezka__link:focus-visible::before {
+  background: var(--brass);
+  border-color: var(--brass);
+  transform: scale(1.4);
+}
+.sciezka__link:focus-visible { outline: 2px solid var(--brass); outline-offset: 4px; }
+
+/* ---------- przed / po ----------
+   Para zdjęć jednego przypadku. Kolumny zostają dwie na każdej szerokości —
+   porównanie rozbite na dwa ekrany przestaje być porównaniem. Kolumna par
+   jest węższa niż treść strony, żeby zdjęcia kliniczne nie rozlewały się na
+   pół metra ekranu. */
+.przedpo {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  max-width: 58rem;
+  margin-inline: auto;
+}
+.przedpo__para {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  margin: 0;
+}
+/* contain, nie cover: te zdjęcia mają różne proporcje (od 1,42 do 1,79) i są
+   dokumentacją zabiegu — kadrowanie mogłoby uciąć to, co ma być widoczne.
+   Ramka trzyma wspólną wysokość, a tło zlewa się z sekcją, więc puste pasy
+   po bokach czytają się jako odstęp, nie jako pudełko. */
+.przedpo__kadr img {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+}
+.przedpo__znak {
+  margin-bottom: 0.75rem;
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--moss);
+}
+.przedpo__znak--po { color: var(--brass); }
+
+/* ---------- kontakt ---------- */
+.contact-list dt {
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.contact-list dd {
+  margin: 0.5rem 0 1.75rem;
+  font-size: var(--step-lead);
+  font-weight: 300;
+}
+.contact-list dd a { text-decoration: none; }
+
+.field { margin-bottom: 1.5rem; }
+.field label {
+  display: block;
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--moss);
+  margin-bottom: 0.5rem;
+}
+.field .req { color: var(--brass); }
+.field input, .field textarea {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  font-size: var(--step-body);
+}
+.field input:focus, .field textarea:focus { outline: 2px solid var(--deep); outline-offset: 1px; }
+.field textarea { min-height: 9rem; resize: vertical; }
+
+/* ---------- pasek SEO ---------- */
+.footer__seo {
+  border-top: 1px solid rgba(206, 210, 190, 0.18);
+  padding: 2rem 0;
+}
+.footer__seo p {
+  max-width: 62ch;
+  font-size: var(--step-eyebrow);
+  line-height: 1.8;
+  /* --sage daje na --deep 4.37:1, a to jest tekst 12 px, więc próg wynosi 4.5.
+     --haze: 8.41:1. Bramka: node park/_praca/kontrast.mjs */
+  color: var(--haze);
+}
+.footer__seo p + p { margin-top: 0.75rem; }
+
+/* ---------- stopka ---------- */
+.footer {
+  background: var(--deep);
+  color: var(--haze);
+  padding-block: clamp(3rem, 6vw, 5rem) 2rem;
+}
+.footer a { color: var(--haze); text-decoration: none; }
+.footer a:hover { color: var(--mist); }
+.footer__grid {
+  display: grid;
+  gap: 2.5rem;
+  grid-template-columns: 1fr;
+  padding-bottom: 3rem;
+}
+@media (min-width: 48rem) { .footer__grid { grid-template-columns: 2fr 1fr 1fr; } }
+.footer__grid h4 {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mist);
+  margin-bottom: 1rem;
+}
+.footer li + li { margin-top: 0.625rem; }
+.footer li, .footer address { font-size: var(--step-small); font-style: normal; line-height: 1.8; }
+.footer .logo { color: var(--paper); }
+/* .logo span jest bursztynowy, a na --deep to 2.73:1 — poniżej progu nawet
+   dla dużego tekstu. W stopce druga sylaba świeci --mist (8.15:1). */
+.footer .logo span { color: var(--mist); }
+.footer__legal {
+  border-top: 1px solid rgba(206, 210, 190, 0.18);
+  padding-top: 2rem;
+  font-size: var(--step-eyebrow);
+  color: var(--haze); /* jak wyżej: --sage to 4.37:1 na --deep */
+}
+
+/* ============================================================
+   WARSTWY
+   Kolejność malowania: tła sekcji (0) < treść (2) < masthead (50).
+   ============================================================ */
+
+body { position: relative; }
+.wrap, .facts, .section-head, .cards, .team, .gallery { position: relative; z-index: 2; }
+.hero, .facts-band, .finale { z-index: 0; }
+body { overflow-x: clip; }
+
+/* Sekcja 2 wjeżdża pod wygaszone dno hero — brak szwu na tafli. */
+/* Pasek faktów zdjął `section--deep` (K3 §2) i stoi na wartości WEJŚCIOWEJ
+   aktu III z mapy tempa §8a, czyli na `--cream`. Kolory tekstu poszły za tłem:
+   stały tu `--mist` i `--haze`, które na kremie dawały 1.53:1 i 1.48:1 —
+   bramka `_praca/kontrast.mjs` złapała to w tej samej minucie, w której
+   sekcja straciła ciemne tło. */
+.facts-band {
+  position: relative;
+  z-index: 0;
+  background: var(--cream);
+  /* Wciągnięcie pod hero zostaje — dzięki niemu krem wychodzi spod
+     ostatniej klatki filmu, zamiast zaczynać się twardą krawędzią.
+     Górny odstęp zjechał z 17rem do 4,5rem, kiedy zszedł pas
+     z nazwami specjalizacji: te 17rem robiły miejsce JEMU, a bez
+     niego zostawał pusty pas kremu na jedną trzecią ekranu. */
+  /* BEZ wciągania pod poprzednią sekcję. `margin-top: -10vh` robiło
+     miejsce pod pas z nazwami specjalizacji, który tu stał; po jego
+     zdjęciu krem wchodził na ostatnie 10vh HERO — czyli dokładnie na
+     przyciski i linię z adresem, bo hero ustawia treść do DOLNEJ
+     krawędzi (`align-items: end`). Zmierzone: hero kończyło się na 900,
+     krem zaczynał na 810. */
+  padding-top: clamp(3rem, 6vw, 5rem);
+  padding-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+.facts-band .facts { border-block: 0; }
+.facts-band .fact { border-color: var(--line); }
+.facts-band dt { color: var(--deep); }   /* 11.46:1 na --cream */
+.facts-band dd { color: var(--moss); }   /* 6.38:1 na --cream */
+
+/* Kręgi na wodzie po plusku wypadły razem z nitką i zębem: były echem
+   sceny, której już nie ma. Przy okazji były jedynym elementem strony
+   wystającym poza prawą krawędź (poświata 90vw ustawiona na 75% szerokości),
+   przez co przeglądarka na telefonie rozszerzała układ z 390 do 469 px
+   i zmniejszała całą stronę. */
+
+/* ---------- finał: ząb wpada w szczękę ---------- */
+.finale {
+  position: relative;
+  overflow: hidden;
+  /* --deep, nie --ink: mapa tempa §8a domyka petle swiatla tym samym kolorem,
+     ktorym akt I schodzil pod wode. Wymog z K5, akt VII. */
+  background: var(--deep);
+  color: var(--sky);
+  min-height: min(90vh, 820px);
+  display: grid;
+  align-items: center;
+}
+.finale h2, .finale h3 { color: var(--sky); }
+.finale .eyebrow { color: var(--mist); }
+.finale .lead { color: var(--haze); }
+/* Płótno sceny 3D. Pełna nieprzezroczystość, bo to nie jest tło pod tekstem —
+   ząb siedzi po prawej, kolumna z treścią po lewej. Przyciemnienie robi mgła
+   w samej scenie, nie CSS. */
+.finale__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Przyciemniacz pod kolumną tekstu — ten sam zabieg co .hero__scrim. Scena 3D
+   stoi po prawej, ale ceramika jest jasna i przy wąskim oknie podchodzi pod
+   nagłówek. Rysowany jako ::after, więc pada na płótno, a nie pod nie. */
+.finale::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Ten sam kolor co tlo sekcji, czyli --deep #1a3631 — nie --ink. */
+  background: linear-gradient(to right,
+    rgba(26, 54, 49, 0.94) 0%,
+    rgba(26, 54, 49, 0.88) 34%,
+    rgba(26, 54, 49, 0.24) 58%,
+    rgba(26, 54, 49, 0) 78%);
+}
+/* `width: 100%` jest konieczne: .finale to grid, a `.wrap` ma
+   `margin-inline: auto`. Automatyczne marginesy w gridzie zjadają wolne
+   miejsce, więc element schodzi do szerokości treści i cała kolumna
+   uciekała o ~250 px w prawo. To samo pokrętło stoi w .hero__inner. */
+.finale__inner { position: relative; z-index: 1; width: 100%; }
+.finale__inner .lead { max-width: 46ch; margin-top: 1.5rem; }
+
+/* ---------- pomocnicze ---------- */
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+.skip:focus {
+  left: 1rem;
+  top: 1rem;
+  z-index: 100;
+  background: var(--deep);
+  color: var(--paper);
+  padding: 0.75rem 1.25rem;
+}
+.crumb {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.crumb a { color: inherit; text-decoration: none; }
+/* Okruszki jako lista, nie jako jedno ogniwo „powrót". Poprzednia wersja
+   dawała wyłącznie skok o poziom w górę; ścieżka mówi też, GDZIE się
+   jest — i jest widocznym odpowiednikiem bloku BreadcrumbList w danych
+   strukturalnych. Google wymaga zgodności jednego z drugim. */
+.crumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.crumb li { display: flex; align-items: center; gap: 0.5rem; }
+.crumb li + li::before {
+  content: '›';
+  opacity: 0.55;
+  font-size: 1.1em;
+  line-height: 1;
+}
+.crumb a:hover { text-decoration: underline; text-underline-offset: 0.25em; }
+.crumb [aria-current] { opacity: 0.72; }
+
+/* ============================================================
+   PREZENTACJA TREŚCI
+   Cztery składniki dołożone po to, żeby tekst i zdjęcia nie leżały
+   na stronie „jak jest": ramka dla akapitów, znaczki dla wyliczeń,
+   karty wyboru dla rozgałęzień i siatka kart dla galerii.
+   Reguła, z której wynikają: zanim coś zostanie zanimowane, musi mieć
+   formę, która sama coś mówi.
+   ============================================================ */
+
+/* ---------- ramka na akapity ----------
+   Kolumna tekstu obok nagłówka czytała się jak ściana. Ramka daje jej
+   krawędź i światło, a bursztynowa kreska w narożniku mówi, gdzie
+   akapit się zaczyna. */
+.rama {
+  position: relative;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--paper);
+}
+.rama::before {
+  content: '';
+  position: absolute;
+  left: clamp(1.5rem, 3vw, 2.5rem);
+  top: -1px;
+  width: 3.5rem;
+  height: 2px;
+  background: var(--brass);
+}
+.section--cream .rama { background: color-mix(in srgb, var(--paper) 70%, transparent); }
+
+/* ---------- znaczki (wyliczenie w jednym wierszu) ----------
+   Trzy słowa oddzielone przecinkami w środku zdania są wyliczeniem
+   udającym prozę. Jako znaczki dają się przeczytać jednym spojrzeniem. */
+.znaczki {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.znaczki li {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--moss);
+  background: var(--paper);
+}
+.znaczki--jasne li {
+  border-color: rgba(214, 205, 170, 0.4);
+  background: transparent;
+  color: var(--mist);
+}
+
+/* ---------- karty wyboru ----------
+   Wszędzie tam, gdzie zdanie obiecuje „dwie listy" albo „sześć dróg",
+   rozgałęzienie ma być widoczne jako rozgałęzienie. */
+.wybor {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 40rem) { .wybor { grid-template-columns: 1fr 1fr; } }
+.wybor__karta {
+  display: grid;
+  gap: 0.4rem;
+  height: 100%;
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--paper);
+  text-decoration: none;
+}
+.wybor__nr {
+  font-family: var(--font-display);
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.14em;
+  color: var(--brass);
+}
+.wybor__nazwa {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--deep);
+}
+.wybor__opis {
+  font-size: var(--step-small);
+  color: var(--moss);
+}
+.wybor__karta:focus-visible { outline: 2px solid var(--brass); outline-offset: 3px; }
+
+/* ---------- kafel oferty ----------
+   Zdjęcia zabiegów tu nie stoją: nie mamy sesji zrobionej pod te sześć
+   haseł, a przypisywanie na wyczucie („kanałowe" ← zdjęcie mostu) daje
+   podpis, który kłamie. Nośnikiem jest numer i krój — kafel dostaje
+   ramkę, numer idzie o dwa stopnie w górę, a „więcej" stoi na dole karty
+   niezależnie od długości opisu. Kadr wraca, kiedy będzie sesja. */
+.card--type {
+  border-top: 0;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--paper);
+}
+.card--type .card__index {
+  font-size: 1.5rem;
+  line-height: 1;
+  margin-bottom: 1.5rem;
+}
+.card--type .card__more { margin-top: auto; padding-top: 1.25rem; }
+
+/* ---------- oferta na telefonie ----------
+   Na wąskim ekranie sześć kart szło jedna pod drugą jako sześć wysokich
+   pudełek: numer zajmował osobny wiersz, pod nim tytuł, pod nim akapit,
+   pod nim odnośnik — razem prawie dwa tysiące pikseli prawie identycznych
+   prostokątów. Numer wraca do wiersza tytułu i staje się tym, czym jest:
+   znacznikiem porządku, nie osobnym piętrem karty. Reszta ustawia się pod
+   tytułem, w jednej kolumnie tekstu.
+
+   Na szerszym ekranie nic się nie zmienia — tam numer trzyma rytm siatki
+   w miejscu, gdzie w wariancie ze zdjęciem stoi kadr. */
+@media (max-width: 39.99rem) {
+  .cards { gap: 0.75rem; }
+  .card--type {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 0.85rem;
+    align-items: baseline;
+    padding: 1.1rem 1.2rem 1.2rem;
+  }
+  .card--type .card__index {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    font-size: 1rem;
+  }
+  .card--type h3 {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    font-size: var(--step-h3);
+    line-height: 1.25;
+  }
+  .card--type p {
+    grid-column: 2;
+    margin-top: 0.5rem;
+  }
+  .card--type .card__more {
+    grid-column: 2;
+    margin-top: 0;
+    padding-top: 0.75rem;
+  }
+}
+.section--cream .card--type { background: color-mix(in srgb, var(--paper) 70%, transparent); }
+
+
+/* Park (kafelki + alejka) wyprowadzony do osobnego arkusza: park.css.
+   Stoi na siedmiu podstronach i ma własną geometrię, więc trzymanie go
+   w arkuszu szkieletu tylko utrudniało szukanie. */
+
+/* ---------- założyciele (kolumna „O nas") ----------
+   Nazwiska są w akapicie obok, ale w środku zdania. Tu stoją jako twarze,
+   bo pacjent szukający „kto mnie przyjmie" nie czyta zdania — patrzy.
+   (Blok wrócił po tym, jak przy wyprowadzaniu parku do park.css został
+   ucięty razem z końcem pliku.) */
+/* ---------- zalozyciele (kolumna Witamy) ----------
+   Nazwiska sa w akapicie obok, ale w srodku zdania. Tu stoja jako twarze,
+   bo pacjent szukajacy „kto mnie przyjmie" nie czyta zdania — patrzy.
+   Karta z kadrem i podpisem pod spodem, nie okragla ikonka: ikonka
+   wielkosci paznokcia przy naglowku na pol ekranu czytala sie jak przypis. */
+.zalozyciele {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+  margin: clamp(2rem, 4vw, 2.75rem) 0 0;
+  padding: 0;
+  list-style: none;
+  max-width: 26rem;
+}
+.zalozyciele li { display: grid; gap: 0.35rem; }
+.zalozyciele__kadr {
+  display: block;
+  overflow: hidden;
+  border-radius: 1rem;
+  background: var(--haze);
+  margin-bottom: 0.5rem;
+}
+.zalozyciele img {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  filter: grayscale(0.4);
+}
+.zalozyciele b {
+  font-size: var(--step-small);
+  font-weight: 500;
+  color: var(--deep);
+  line-height: 1.25;
+}
+.zalozyciele__rola {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--moss);
+}
+
+/* ---------- kontakt: kafelki i formularz ----------
+   Adres, telefon i e-mail to trzy rozne rzeczy do zrobienia — dojechac,
+   zadzwonic, napisac — a nie trzy wiersze jednego opisu. Kazda dostaje
+   wlasne pole; te, ktore da sie kliknac, sa klikalne w calosci, a nie
+   samym numerem. Formularz obok stoi w takiej samej ramce, wiec obie
+   drogi kontaktu waza tyle samo. */
+.kontakt-kafle {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.75rem;
+  margin: clamp(1.5rem, 3vw, 2.25rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.kontakt-kafel {
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--paper);
+  transition: border-color .35s var(--ruch-krzywa, ease);
+}
+.kontakt-kafel:hover { border-color: var(--deep); }
+/* Odstępy i wyściółkę dostaje SAM kafelek, a nie jego dzieci. Reguła
+   ustawiona na dzieciach dawała `height: 100%` etykiecie, ta rozdymała
+   się na całą wysokość kafla i wypychała treść poniżej jego dolnej
+   krawędzi — adres znikał z pola, mimo że stał w znacznikach. */
+.kontakt-kafel {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  padding: clamp(0.9rem, 1.6vw, 1.15rem);
+}
+/* Kafel z odnośnikiem oddaje wyściółkę odnośnikowi, żeby klikalne było
+   całe pole, a nie sam napis. */
+.kontakt-kafel:has(> a) { padding: 0; gap: 0; }
+.kontakt-kafel > a {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  padding: clamp(0.9rem, 1.6vw, 1.15rem);
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+.kontakt-kafel__etykieta {
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+  line-height: 1.3;
+}
+.kontakt-kafel__tresc {
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 300;
+  line-height: 1.25;
+  color: var(--deep);
+  font-variant-numeric: tabular-nums;
+}
+.kontakt-kafel__tresc--male { font-size: var(--step-body); word-break: break-word; }
+
+/* Formularz w ramce — tej samej, co akapity i listy zabiegow. */
+.formularz {
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--paper);
+}
+@media (min-width: 40rem) {
+  /* Imie i telefon stoja obok siebie: obydwa sa krotkie, a osobne wiersze
+     rozciagaly formularz na cala wysokosc kolumny obok. */
+  .formularz { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+  .formularz > .field:nth-child(n+3),
+  .formularz > .btn,
+  .formularz > button { grid-column: 1 / -1; }
+}
+.formularz .field input,
+.formularz .field textarea {
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--cream) 55%, var(--paper));
+}
+.formularz .field input:focus,
+.formularz .field textarea:focus { background: var(--paper); }
+
+/* ---------- stopka: NAP i godziny ----------
+   Adres, telefon i godziny zapisane dokładnie tak, jak w wizytówce Google.
+   To nie jest kosmetyka: różne warianty tego samego adresu algorytm czyta
+   jako różne firmy i dzieli między nie sygnały lokalne. */
+.stopka-nap { margin-top: 1.25rem; font-style: normal; }
+.stopka-godziny {
+  margin-top: 1.25rem;
+  font-size: var(--step-small);
+  line-height: 1.7;
+  color: inherit;
+}
+.stopka-godziny b {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+/* ---------- pasek akcji na telefonie ----------
+   Trzy rzeczy, po ktore pacjent przychodzi na strone gabinetu: zadzwonic,
+   dojechac, umowic sie. Pojawia sie tylko tam, gdzie numer z paska
+   nawigacji znika — czyli ponizej 62rem. */
+.pasek-akcji { display: none; }
+@media (max-width: 61.99rem) {
+  .pasek-akcji {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.25fr;
+    gap: 1px;
+    background: var(--line);
+    border-top: 1px solid var(--line);
+    /* Pasek gestu na iPhonie zjada dolne kilkanascie pikseli. */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -0.5rem 1.5rem rgba(16, 26, 22, 0.12);
+  }
+  .pasek-akcji__poz {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    /* Cel dotykowy nie mniejszy niz 48 px — wymog z 03-FIX-TECHNICZNY §1b. */
+    min-height: 52px;
+    padding: 0.5rem;
+    background: var(--paper);
+    color: var(--deep);
+    font-size: var(--step-small);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .pasek-akcji__poz--glowna { background: var(--deep); color: var(--paper); }
+  /* Stopka nie moze konczyc sie pod paskiem. */
+  .footer { padding-bottom: calc(52px + env(safe-area-inset-bottom, 0px) + 1.5rem); }
+  /* Otwarty panel menu zakrywa cala strone — pasek pod nim nie ma sensu. */
+  body:has(.menu-panel:not([hidden])) .pasek-akcji { display: none; }
+}
+
+/* ---------- formularz: zgoda i pola wyboru ----------
+   Zgoda RODO i deklaracja czasu odpowiedzi idą przez całą szerokość
+   formularza — to nie jest kolejne pole obok telefonu, tylko warunek
+   wysłania i obietnica, której pacjent szuka przed kliknięciem. */
+.field--pelna { grid-column: 1 / -1; }
+.field select {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--step-small);
+}
+.field select:focus { outline: 2px solid var(--deep); outline-offset: 1px; }
+.field.zgoda .zgoda__pole {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: var(--step-small);
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--moss);
+}
+.field.zgoda .zgoda__pole input {
+  /* Cel dotykowy nie mniejszy niż 24 px — pole wyboru bywa jedynym
+     miejscem, w którym formularz da się zablokować palcem. */
+  flex: 0 0 auto;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-top: 0.1rem;
+  accent-color: var(--deep);
+}
+.zgoda__nota {
+  margin: 0.75rem 0 0;
+  font-size: var(--step-eyebrow);
+  line-height: 1.6;
+  color: var(--moss);
+}
+.zgoda__nota a { color: var(--deep); }
+.formularz__czas {
+  grid-column: 1 / -1;
+  margin: 0 0 1.25rem;
+  font-size: var(--step-small);
+  color: var(--moss);
+}
+
+/* ---------- szkielet strony czekającej na treść ----------
+   Widoczny, brzydki i niepodobny do reszty strony — celowo. Znacznik,
+   który wygląda jak treść, zostaje na stronie na zawsze. */
+.szkielet-nota {
+  max-width: 72ch;
+  margin: 0 auto 2rem;
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--brass);
+  background: color-mix(in srgb, var(--brass) 8%, transparent);
+  font-size: var(--step-small);
+  line-height: 1.6;
+  color: var(--moss);
+}
+.szkielet-nota code { font-size: 0.92em; }
+.do-wypelnienia {
+  margin: 0.75rem 0 2rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px dashed var(--brass);
+  border-radius: 0.75rem;
+  font-size: var(--step-small);
+  line-height: 1.6;
+  color: var(--moss);
+}
+.do-wypelnienia b {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+/* ---------- tekst tylko dla czytnika ekranu i dla wyszukiwarki ----------
+   Anchor „więcej »" powtarzał się sześć razy na stronie i nie mówił ani
+   czytnikowi ekranu, ani wyszukiwarce, DOKĄD prowadzi. Nazwa usługi
+   dopisana w środku odnośnika naprawia jedno i drugie, nie ruszając
+   kompozycji karty. */
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* ---------- lekarze: kwalifikacje ----------
+   Nazwisko, funkcja i numer prawa wykonywania zawodu to dane, nie proza —
+   stąd lista definicji, a nie akapit. Numer PWZ jest w stomatologii
+   najkrótszą drogą do sprawdzenia, kto naprawdę leczy. */
+.lekarze {
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  grid-template-columns: 1fr;
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+/* Czterech lekarzy: dwie kolumny po dwa, nie trzy plus sierota. Przy
+   `auto-fit` czwarta karta zostawała sama w wierszu i obok niej stała
+   pusta połowa sekcji. */
+@media (min-width: 46rem) { .lekarze { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Panel sterowany karuzelą: widoczny jest opis osoby, której zdjęcie stoi
+   na środku. Klasę `karuzela--z-panelem` dokłada ruch.js dopiero wtedy, gdy
+   karuzela naprawdę ruszyła — bez skryptu wszystkie opisy zostają widoczne
+   i strona czyta się w całości. */
+.karuzela--z-panelem ~ * .lekarze,
+body:has(.karuzela--z-panelem) .lekarze {
+  display: block;
+  max-width: 46rem;
+  /* Opis stoi tuż pod zdjęciem, którego dotyczy — nie w osobnej sekcji
+     pół ekranu niżej. Stała wysokość minimalna trzyma sterowanie karuzeli
+     w miejscu przy przekładaniu osób o różnej długości opisu. */
+  min-height: 12rem;
+  margin: clamp(1.5rem, 3vw, 2.25rem) auto 0;
+}
+body:has(.karuzela--z-panelem) .lekarze > [data-osoba] { display: none; }
+body:has(.karuzela--z-panelem) .lekarze > .lekarz--widoczny { display: block; }
+
+.lekarz {
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--paper);
+}
+.lekarz h3 { margin: 0 0 0.6rem; font-size: var(--step-h3); }
+.lekarz p { margin: 0 0 1.1rem; font-size: var(--step-small); color: var(--moss); }
+.lekarz__dane {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-size: var(--step-small);
+}
+.lekarz__dane dt {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+  align-self: center;
+}
+.lekarz__dane dd { margin: 0; font-variant-numeric: tabular-nums; color: var(--deep); }
+.link-dalej {
+  font-size: var(--step-small);
+  font-weight: 500;
+  color: var(--deep);
+  text-underline-offset: 0.25em;
+}
+
+
+/* ---------- pasek zgody na pomiar ----------
+   Pokazuje się tylko wtedy, gdy licznik jest włączony (czyli gdy w pliku
+   analityka.js wpisano identyfikator) i tylko do pierwszej odpowiedzi.
+   Stoi nad paskiem akcji na telefonie, żeby go nie zasłaniać. */
+.zgoda-pasek {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 55;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.75rem, 2vw, 2rem);
+  padding: clamp(0.9rem, 2vw, 1.25rem) clamp(1rem, 4vw, 2.5rem);
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: 0 -0.75rem 2rem rgba(16, 26, 22, 0.14);
+}
+.zgoda-pasek__tekst {
+  flex: 1 1 22rem;
+  margin: 0;
+  max-width: 46rem;
+  font-size: var(--step-small);
+  line-height: 1.55;
+  color: var(--moss);
+}
+.zgoda-pasek__tekst a { color: var(--deep); }
+.zgoda-pasek__akcje { display: flex; align-items: center; gap: 0.75rem; }
+.zgoda-pasek__nie {
+  min-height: 44px;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: 100px;
+  background: transparent;
+  color: var(--moss);
+  font: inherit;
+  font-size: var(--step-small);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+.zgoda-pasek__nie:hover { color: var(--deep); }
+@media (max-width: 61.99rem) {
+  /* Nad paskiem „Zadzwoń · Dojazd · Umów wizytę". */
+  .zgoda-pasek { bottom: calc(52px + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* ---------- kontakt: równe kolumny i mapa na żądanie ----------
+   `.split` centruje kolumny w pionie — dobrze tam, gdzie po lewej stoi
+   sam nagłówek. Na stronie kontaktu obie kolumny to pełne bloki treści,
+   więc centrowanie odsuwało kafelki o 260 px w dół względem formularza. */
+@media (min-width: 62rem) {
+  .kontakt-split { align-items: start; }
+}
+.dojazd { margin-top: 2rem; display: grid; gap: 1.25rem; justify-items: start; }
+.mapa { width: 100%; }
+.mapa__wlacz {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.35rem 1rem;
+  width: 100%;
+  min-height: 8rem;
+  padding: 1.5rem;
+  border: 1px dashed var(--line);
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, var(--sage) 16%, var(--paper));
+  color: var(--deep);
+  font: inherit;
+  text-align: left;
+  transition: border-color .35s var(--ruch-krzywa, ease),
+              background-color .35s var(--ruch-krzywa, ease);
+}
+.mapa__wlacz:hover {
+  border-color: var(--deep);
+  background: color-mix(in srgb, var(--sage) 26%, var(--paper));
+}
+.mapa__ikona { grid-row: span 2; color: var(--brass); display: grid; place-items: center; }
+.mapa__opis { font-size: var(--step-small); line-height: 1.5; color: var(--moss); }
+.mapa__opis b {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 400;
+  color: var(--deep);
+}
+.mapa__nota { grid-column: 2; font-size: var(--step-eyebrow); color: var(--moss); }
+.mapa iframe {
+  display: block;
+  width: 100%;
+  height: clamp(16rem, 34vh, 24rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+}
+
+/* ---------- kontakt: akcje główne ----------
+   Telefon jest w tym gabinecie główną drogą rejestracji, a wyglądał jak
+   jeden z sześciu jednakowych kafelków z danymi. Dostaje formę przycisku —
+   tę samą, którą ma „Umów wizytę". E-mail obok, obrysowany: druga droga,
+   nie równorzędna. */
+.akcje-kontakt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+.akcja {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 52px;
+}
+.akcja svg { flex: 0 0 auto; }
+.btn--obrys {
+  background: transparent;
+  border: 1px solid var(--deep);
+  color: var(--deep);
+}
+.btn--obrys:hover { background: var(--deep); color: var(--paper); }
+@media (max-width: 30rem) {
+  .akcje-kontakt { flex-direction: column; align-items: stretch; }
+  .akcja { justify-content: center; }
+}
+
+/* Oceny w nagłówku sekcji na stronie głównej: dwa pola zamiast trzech
+   i mniejsza liczba — to zapowiedź, nie pełne zestawienie. Pełne stoi
+   na `opinie.html`. */
+.oceny--zwarte { grid-template-columns: repeat(2, minmax(0, 1fr)); align-self: end; }
+.oceny--zwarte .ocena { padding: 1rem 1.15rem; }
+.oceny--zwarte .ocena__liczba { font-size: 2rem; }
+
+/* ---------- gwiazdki przy ocenie ----------
+   Dwie warstwy tych samych pięciu gwiazdek: spodnia w kolorze linii,
+   wierzchnia w mosiądzu i przycięta do szerokości równej ocenie. Przy 4,5
+   daje to 90% szerokości, czyli cztery gwiazdki i połowę piątej — a nie
+   pięć zaokrąglonych w górę. */
+.gwiazdki {
+  position: relative;
+  display: inline-block;
+  margin-top: 0.15rem;
+  line-height: 0;
+  white-space: nowrap;
+}
+.gwiazdki__tlo,
+.gwiazdki__pelne {
+  display: block;
+  white-space: nowrap;
+}
+.gwiazdki__tlo { color: color-mix(in srgb, var(--moss) 30%, transparent); }
+.gwiazdki__pelne {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  color: var(--brass);
+}
+.gwiazdki svg { fill: currentColor; }
+
+/* ---------- odnośnik, który jest przyciskiem ----------
+   Odnośnik stojący samodzielnie — nie w środku zdania — dostaje zielone
+   kółko ze strzałką. Wcześniej kończył się znakiem », który przy małym
+   stopniu pisma ginie i nie wygląda na cel do kliknięcia.
+   Na ciemnych sekcjach kolory kółka i strzałki zamieniają się miejscami,
+   żeby ikona nie znikała w tle. */
+.link-dalej,
+.card__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.link-dalej::after,
+.card__more::after {
+  content: '';
+  flex: 0 0 auto;
+  width: 1.5em;
+  height: 1.5em;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%231a3631'/%3E%3Cpath d='M8 12h7m-2.6-3.2L15.6 12l-3.2 3.2' fill='none' stroke='%23fbfaf5' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform .35s var(--ruch-krzywa, ease);
+}
+.link-dalej:hover::after,
+.card__more:hover::after { transform: translateX(3px); }
+.section--deep .link-dalej::after,
+.section--deep .card__more::after,
+.usluga-pas .link-dalej::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23fbfaf5'/%3E%3Cpath d='M8 12h7m-2.6-3.2L15.6 12l-3.2 3.2' fill='none' stroke='%231a3631' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+.opinie__akcja { margin-top: 1.75rem; }
+
+/* ---------- opinie: przesuwane kafelki ----------
+   Ta sama ramka i to samo tło, co kafelki ocen obok — bo to ten sam typ
+   treści. Przesuwanie robi natywne `scroll-snap`, nie skrypt: działa bez
+   JavaScriptu, palcem na telefonie i klawiaturą. Strzałki tylko dokładają
+   wygody. */
+.opinie {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(min(22rem, 82vw), 1fr);
+  gap: clamp(1rem, 2vw, 1.5rem);
+  margin-top: clamp(2rem, 4vw, 3rem);
+  padding-bottom: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.opinie::-webkit-scrollbar { display: none; }
+.opinia {
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin: 0;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--paper);
+}
+.opinia blockquote { margin: 0; flex: 1 1 auto; }
+.opinia blockquote p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  font-weight: 300;
+  line-height: 1.35;
+  color: var(--deep);
+}
+.opinia figcaption {
+  display: grid;
+  gap: 0.15rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-size: var(--step-small);
+  color: var(--moss);
+}
+.opinia figcaption b { font-weight: 500; color: var(--ink); }
+.opinia figcaption a { font-size: var(--step-eyebrow); color: var(--brass); }
+.gwiazdki--male { margin: 0; }
+.opinie__ster { justify-content: flex-start; margin-top: 1.25rem; }
+
+/* ---------- kafelki ocen ----------
+   Ocena to liczba, więc dostaje wielkość liczby, nie akapitu. Data odczytu
+   stoi przy każdej — ocena bez daty starzeje się w ciszy, a przy placówce
+   medycznej to różnica między dowodem a ozdobą. */
+.oceny {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ocena {
+  display: grid;
+  gap: 0.15rem;
+  justify-items: start;
+  padding: 1.25rem 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--paper);
+}
+.ocena__gdzie {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.ocena__liczba {
+  font-family: var(--font-display);
+  font-size: 2.75rem;
+  line-height: 1.05;
+  color: var(--deep);
+  font-variant-numeric: tabular-nums;
+}
+.ocena__ile { font-size: var(--step-small); color: var(--moss); }
+.ocena__data { font-size: var(--step-eyebrow); color: var(--moss); }
+/* Odnośnik pod oceną jest przyciskiem, nie podkreślonym słowem: prowadzi
+   poza stronę, a podkreślony tekst przy małym stopniu pisma nie wygląda na
+   cel do kliknięcia i ma za małe pole trafienia na telefonie. */
+.ocena__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  margin: 0.75rem 0 0.35rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 100px;
+  background: var(--deep);
+  color: var(--paper);
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: background-color .35s var(--ruch-krzywa, ease);
+}
+.ocena__link:hover { background: color-mix(in srgb, var(--deep) 82%, var(--brass)); }
+
+/* Kafelek opinii idzie w ślad za kafelkiem oceny: ta sama etykieta
+   wersalikami w mosiądzu i ten sam stopień pisma w podpisie. */
+.opinia figcaption b {
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.opinia figcaption span { font-size: var(--step-small); color: var(--moss); }
+.opinia figcaption a {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 100px;
+  background: var(--deep);
+  color: var(--paper);
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+.opinia figcaption a:hover { background: color-mix(in srgb, var(--deep) 82%, var(--brass)); }
+
+/* ---------- przycisk e-mail ----------
+   Kopiuje adres i mówi o tym wprost — patrz komentarz w ruch.js. */
+.akcja--skopiowane { position: relative; }
+.akcja__potwierdzenie {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.5rem);
+  transform: translateX(-50%);
+  padding: 0.35rem 0.75rem;
+  border-radius: 100px;
+  background: var(--deep);
+  color: var(--paper);
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  pointer-events: none;
+}

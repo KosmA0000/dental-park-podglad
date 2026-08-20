@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="refresh" content="15">
+<title>DentalPark — postęp przebudowy</title>
+<style>
+  :root {
+    --deep: #1a3631; --ink: #101a16; --paper: #fbfaf5; --cream: #f2f1e8;
+    --moss: #4b5b4d; --brass: #8a6f39; --sky: #e6eadc; --line: #d8d8c8;
+    --ok: #2f6f4f; --czeka: #8a6f39; --pada: #8c3b2f;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: clamp(1.5rem, 4vw, 3.5rem);
+    background: var(--paper); color: var(--ink);
+    font: 400 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  header { max-width: 72rem; margin: 0 auto 2.5rem; }
+  h1 { font-size: clamp(1.6rem, 3vw, 2.4rem); margin: 0 0 .35rem; letter-spacing: -.02em; color: var(--deep); }
+  .sub { color: var(--moss); margin: 0; font-size: .95rem; }
+  main { max-width: 72rem; margin-inline: auto; }
+  .porty { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.5rem 0 2.5rem; }
+  .port {
+    display: inline-flex; align-items: baseline; gap: .55rem;
+    padding: .6rem .95rem; border: 1px solid var(--line); border-radius: 999px;
+    text-decoration: none; color: var(--deep); background: #fff;
+  }
+  .port b { font-weight: 600; }
+  .port span { color: var(--moss); font-size: .85rem; }
+  .port--zywy { border-color: var(--deep); background: var(--deep); color: var(--paper); }
+  .port--zywy span { color: #b9c9bd; }
+  h2 { font-size: 1rem; text-transform: uppercase; letter-spacing: .14em; color: var(--brass); margin: 2.5rem 0 1rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .93rem; }
+  th { text-align: left; font-weight: 600; color: var(--moss); border-bottom: 1px solid var(--line); padding: .5rem .6rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; }
+  td { padding: .7rem .6rem; border-bottom: 1px solid #ececdf; vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  .stan { display: inline-block; padding: .15rem .55rem; border-radius: 999px; font-size: .78rem; font-weight: 600; white-space: nowrap; }
+  .s-czeka { background: #f4efe0; color: var(--czeka); }
+  .s-idzie { background: #e4ece6; color: var(--ok); }
+  .s-wygral { background: var(--ok); color: #fff; }
+  .s-pada { background: #f6e3df; color: var(--pada); }
+  .log { font-size: .9rem; color: var(--moss); }
+  .log li { margin-bottom: .45rem; }
+  .log code, td code { font: 500 .85em ui-monospace, SFMono-Regular, Consolas, monospace; background: var(--cream); padding: .1rem .35rem; border-radius: 4px; color: var(--ink); }
+  footer { max-width: 72rem; margin: 3rem auto 0; padding-top: 1.25rem; border-top: 1px solid var(--line); color: var(--moss); font-size: .85rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: var(--ink); color: var(--sky); }
+    h1 { color: var(--sky); } .port { background: #16241f; border-color: #2a3f38; color: var(--sky); }
+    td { border-bottom-color: #23342e; } th { border-bottom-color: #2a3f38; }
+    .log code, td code { background: #1d2f29; color: var(--sky); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>DentalPark — przebudowa w formie parku</h1>
+  <p class="sub">Poprzeczka to podłoga, nie wzór — <strong>skyclinics.al</strong> na rzemiosło, strony nagradzane (igloo.inc, Site of the Day WebGL) na 3D. Krytyk nie pyta „czy podobne", tylko „czy nasze lepsze: czytelniejsze, sensowniejsze, szybsze w znalezieniu informacji". Strona odświeża się sama co 15 s.</p>
+  <div class="porty">
+    <a class="port port--zywy" href="http://127.0.0.1:8002/"><b>:8002</b> <span>nowa — park (w budowie)</span></a>
+    <a class="port" href="http://127.0.0.1:8000/"><b>:8000</b> <span>obecna</span></a>
+    <a class="port" href="http://127.0.0.1:8001/"><b>:8001</b> <span>stara, przed 3D</span></a>
+    <a class="port" href="https://skyclinics.al/"><b>skyclinics.al</b> <span>poprzeczka</span></a>
+  </div>
+</header>
+
+<main>
+  <h2>Kawałki</h2>
+  <table>
+    <thead><tr><th style="width:22%">Kawałek</th><th style="width:13%">Stan</th><th>Ostatnia uwaga krytyka</th></tr></thead>
+    <tbody id="kawalki">
+      <tr><td>Poprzeczka — zrzuty</td><td><span class="stan s-wygral">zebrane</span></td><td>Dwa zrzuty w <code>park/_wzorzec/</code> plus architektura informacji. Canvasy WebGL wychodzą puste w karcie automatu — ocena 3D idzie po stronach nagradzanych i po osądzie, nie po fałszywym pomiarze.</td></tr>
+      <tr><td><b>Płynność scrolla</b></td><td><span class="stan s-idzie">idzie</span></td><td>Martwy scroll przy przewijaniu od dołu w górę: blokada z hero zakładała się przed przywróceniem pozycji przez przeglądarkę. Naprawione w <code>thread.js</code>. Krytyk wydajności mierzy resztę Playwrightem.</td></tr>
+      <tr><td>Typografia</td><td><span class="stan s-wygral">gotowe</span></td><td><b>Newsreader</b> (szeryf redakcyjny, zmienny stopień optyczny) + <b>Public Sans</b> (grotesk, prawdziwa kursywa, cyfry tabelaryczne). Weszło na 12 stron i do generatora. Inter i Fraunces zniknęły z całego katalogu.</td></tr>
+      <tr><td>Treść 1:1 — strażnik</td><td><span class="stan s-wygral">gotowe</span></td><td>252 ciągi, 58 zdjęć, 65 opisów alternatywnych pod ochroną. <code>node park/_praca/tresc/sprawdz.mjs</code> przewraca budowę, gdy cokolwiek zniknie. Po wymianie typografii: przeszło.</td></tr>
+      <tr><td>Godziny przyjęć → kalendarz</td><td><span class="stan s-idzie">do dopieszczenia</span></td><td>Działa, godziny co do znaku, „dzisiaj" zaznaczone, asystentki poza siatką. Do poprawy: ciężkie linie siatki, powtarzane „–" jako szum, zbędna ramka wokół nagłówka.</td></tr>
+      <tr><td><b>Wnętrze oferty</b></td><td><span class="stan s-wygral">gotowe</span></td><td>Sześć podstron usług miało jeden układ: nagłówek, akapit na 1200 znaków, dwie listy. Teraz każda ma pas nagłówkowy na głębi z nitką, boczny indeks śródtytułów z zaznaczeniem miejsca, pierwsze zdanie wyprowadzone przed ścianę tekstu, listy jako wiersze w dwóch kolumnach z rytmem wejścia i pasek postępu czytania. Wpięte przez generator, więc rebuild tego nie cofnie.</td></tr>
+      <tr><td><b>Ścieżka usług na stronie głównej</b></td><td><span class="stan s-wygral">gotowe</span></td><td>Było: nagłówek i jeden przycisk (plus błąd w znacznikach — o jeden <code>&lt;/div&gt;</code> za dużo). Jest: sześć przystanków na jednej kresce, nazwa i opis co do słowa z <code>oferta.html</code>, asymetria kolumn 5/7, kropka wypełnia się przy najechaniu. Lista, nie siatka kafelków — kafelki to najczęstszy odruch generatora.</td></tr>
+      <tr><td>Kroki w „Dobrych radach"</td><td><span class="stan s-czeka">następne</span></td><td>Instrukcja jest gotową sekwencją — lista punktowana udaje, że wszystkie kroki są równoczesne.</td></tr>
+      <tr><td>Oś czasu w pasku faktów</td><td><span class="stan s-czeka">czeka</span></td><td>1999 · 2 · 6 · RTG jako przystanki, doliczające się przy wejściu w kadr.</td></tr>
+      <tr><td>Plan przychodni</td><td><span class="stan s-czeka">czeka</span></td><td>Pinezki wiążące osiem zdjęć z akapitem o gabinetach, RTG, parkingu i Wi-Fi.</td></tr>
+      <tr><td>Mapa parku w ofercie</td><td><span class="stan s-czeka">czeka</span></td><td>Sześć usług jako miejsca na ścieżce — spina koncepcję.</td></tr>
+      <tr><td>Hero</td><td><span class="stan s-czeka">czeka</span></td><td>Zostaje jako szczyt. Blokada scrolla naprawiona.</td></tr>
+      <tr><td>Park — scena 3D</td><td><span class="stan s-czeka">czeka</span></td><td>Ocena obok stron nagradzanych, nie obok poprzeczki.</td></tr>
+      <tr><td>Mobile</td><td><span class="stan s-czeka">czeka</span></td><td>—</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Co czym się staje</h2>
+  <p class="log" style="margin:0 0 1rem">Kalendarz był przykładem, nie celem. Zasada: długi tekst czytany linijka po linijce dostaje formę, która niesie tę samą treść szybciej. Treść zostaje co do słowa — zmienia się sposób podania.</p>
+  <table>
+    <thead><tr><th style="width:34%">Treść dziś</th><th style="width:24%">Staje się</th><th>Dlaczego lepsze, a nie tylko ładniejsze</th></tr></thead>
+    <tbody>
+      <tr><td>Pasek faktów: 1999 · 2 · 6 · RTG</td><td>Oś czasu parku</td><td>Liczby są już porcjami. Oś dodaje relację: rok założenia to początek ścieżki.</td></tr>
+      <tr><td>„O nas" — dwa gęste akapity</td><td>Trzy przystanki</td><td>Akapit pełen dat i nazwisk czyta się dwa razy. Rozbity na trzy zatrzymania — raz.</td></tr>
+      <tr><td>„Klinika" — akapit + osiem zdjęć obok siebie</td><td>Plan przychodni z pinezkami</td><td>Odpowiada na „co tam jest" przestrzennie i wiąże zdjęcia z tekstem, dziś leżące luzem.</td></tr>
+      <tr><td>Oferta — sześć usług po podstronach</td><td>Mapa parku</td><td>Cały zakres w jednym spojrzeniu, bez wracania do menu po każdej podstronie.</td></tr>
+      <tr><td>„Dobre rady" — dwie listy punktowane</td><td>Kroki z paskiem postępu</td><td>Instrukcja jest sekwencją. Lista udaje, że wszystkie punkty są równoczesne.</td></tr>
+      <tr><td>Godziny przyjęć sześciu osób</td><td>Kalendarz tygodnia</td><td>Dwie drogi czytania w jednej siatce: po dniu i po lekarzu.</td></tr>
+      <tr><td>Przed / po</td><td>Zsynchronizowane odsłonięcie pary</td><td>Osobne wejścia rozbijają porównanie na dwa niezwiązane obrazki.</td></tr>
+    </tbody>
+  </table>
+  <p class="log" style="margin:1rem 0 0"><strong>Świadomie nie zamieniamy:</strong> opisów medycznych zabiegów (ich wartością jest ciągłość wywodu), danych kontaktowych (mają być do kliknięcia, nie do oglądania), formularza i stopki.</p>
+
+  <h2>Bramki</h2>
+  <table>
+    <tbody>
+      <tr><td style="width:22%"><code>slopscan</code></td><td style="width:13%"><span class="stan s-pada">pada</span></td><td>1 fail, 1 warn na obecnej wersji: <code>RAW_SCROLL_LISTENER</code> w <code>thread.js</code>, <code>POINTER_NO_RAF</code> w <code>scena.js</code>.</td></tr>
+      <tr><td><code>motionqa</code></td><td><span class="stan s-czeka">czeka</span></td><td>60 fps przy DPR 2 — jeszcze nie mierzone.</td></tr>
+      <tr><td>Kontrast</td><td><span class="stan s-czeka">czeka</span></td><td>Minimum 4.5:1 na tekście.</td></tr>
+      <tr><td>Treść 1:1</td><td><span class="stan s-czeka">czeka</span></td><td>Wszystkie polskie teksty i zdjęcia muszą przeżyć przebudowę co do słowa.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Dziennik</h2>
+  <ul class="log" id="dziennik">
+    <li>Zainstalowane narzędzia: <code>auteur</code> (slopscan, motionqa, shoot, scroll-flight), <code>gsap-scrolltrigger</code>, <code>threejs-webgl</code>, <code>lottie-animations</code>, <code>animejs</code>, <code>lightweight-3d-effects</code>, <code>modern-web-design</code>, <code>scroll-reveal-libraries</code>.</li>
+    <li>Już były u ciebie: <code>find-animation-opportunities</code>, <code>review-animations</code>, <code>webgl-premium-render</code>, <code>premium-review</code>, <code>gauntlet-loop</code>.</li>
+    <li>Kopia obecnej strony zabezpieczona w <code>site-kopia-przed-3d/</code> i wystawiona na <code>:8001</code>.</li>
+    <li>Budowa idzie w <code>park/</code>, wystawiona na <code>:8002</code>. Obecna strona na <code>:8000</code> zostaje nietknięta jako punkt odniesienia.</li>
+  </ul>
+</main>
+
+<footer>
+  Zamknięte na czas przebudowy: paleta, zdjęcia, polskie teksty, dane kontaktowe, wideo hero.
+  Wolne: kolejność sekcji, układ, typografia, animacja, cała reżyseria.
+</footer>
+<script src="analityka.js" defer></script>
+</body>
+</html>
