@@ -530,7 +530,12 @@
       const doOdsloniecia = gsap.utils.toArray([
         ".prose > *", "section .lead", ".wrap > .btn-row", ".contact-list > *",
         ".field", "form .btn", ".footer__grid > div", ".footer__seo p",
-      ]).filter((el) => !el.closest(".hero"));
+      /* Formularze konta sa wylaczone z tego wejscia. Reszta strony to
+         tresc do czytania i moze sie odslaniac w miare przewijania, ale
+         logowanie jest jedynym powodem, dla ktorego ktos tam wchodzi:
+         puste ramki zamiast pol przy pierwszym spojrzeniu czytaja sie
+         jako awaria, a nie jako animacja, ktora zaraz przyjdzie. */
+      ]).filter((el) => !el.closest(".hero") && !el.closest(".konto-karta"));
 
       gsap.set(doOdsloniecia, { y: 26, autoAlpha: 0 });
       ScrollTrigger.batch(doOdsloniecia, {
@@ -680,6 +685,24 @@
         if (wiecej) tl.to(wiecej, { x: 6 }, 0);
         kafel.addEventListener("pointerenter", () => tl.play());
         kafel.addEventListener("pointerleave", () => tl.reverse());
+      });
+
+      /* ======================================================
+         HASŁO — PODGLĄD
+         Hasło wpisywane w ciemno na telefonie to najczęstsza przyczyna
+         nieudanego logowania: literowka jest niewidoczna, aż do odmowy.
+         Przycisk odkrywa je na życzenie i sam mówi, w którym jest stanie.
+         ====================================================== */
+      document.querySelectorAll("[data-pokaz]").forEach((btn) => {
+        const pole = document.getElementById(btn.dataset.pokaz);
+        if (!pole) return;
+        btn.addEventListener("click", () => {
+          const jawne = pole.type === "text";
+          pole.type = jawne ? "password" : "text";
+          btn.textContent = jawne ? "pokaż" : "ukryj";
+          btn.setAttribute("aria-label", jawne ? "Pokaż hasło" : "Ukryj hasło");
+          pole.focus();
+        });
       });
 
       /* ======================================================

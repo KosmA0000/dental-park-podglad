@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Umów wizytę online — Dental Park Kielce</title>
+<meta name="description" content="Wybierz wolną godzinę u dentysty w Kielcach i zarezerwuj termin. Opłata rezerwacyjna 20 zł, zwracana po wizycie.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://www.dentalpark.kie.pl/rezerwacja.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pl_PL">
+<meta property="og:site_name" content="Dental Park Kielce">
+<meta property="og:title" content="Umów wizytę online — Dental Park Kielce">
+<meta property="og:description" content="Wybierz wolną godzinę u dentysty w Kielcach i zarezerwuj termin. Opłata rezerwacyjna 20 zł, zwracana po wizycie.">
+<meta property="og:url" content="https://www.dentalpark.kie.pl/rezerwacja.html">
+<meta property="og:image" content="https://www.dentalpark.kie.pl/img/og-dental-park-kielce.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preload" href="fonts/newsreader-normal-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/public-sans-normal-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonty.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="typo.css">
+<link rel="stylesheet" href="ruch.css">
+<link rel="stylesheet" href="usluga.css">
+<link rel="stylesheet" href="konto.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Strona g\u0142\u00f3wna", "item": "https://www.dentalpark.kie.pl/" },
+    { "@type": "ListItem", "position": 2, "name": "Um\u00f3w wizyt\u0119", "item": "https://www.dentalpark.kie.pl/rezerwacja.html" }
+  ]
+}
+</script></head>
+<body>
+<a class="skip" href="#main">Przejdź do treści</a>
+
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <a class="logo" href="index.html">dental<span>park</span></a>
+    <nav class="nav" aria-label="Główna">
+      <a href="index.html"><span>O nas</span></a>
+      <a href="oferta.html"><span>Oferta</span></a>
+      <a href="cennik.html"><span>Cennik</span></a>
+      <a href="zespol.html"><span>Zespół</span></a>
+      <a href="opinie.html"><span>Opinie</span></a>
+      <a href="galeria.html"><span>Galeria</span></a>
+      <a href="dobre-rady.html"><span>Dobre rady</span></a>
+      <a href="kontakt.html"><span>Kontakt</span></a>
+      <a href="logowanie.html"><span>Moje konto</span></a>
+    </nav>
+    <div class="masthead__aside">
+      <a class="masthead__tel" href="tel:+48413431671">41 343 16 71</a>
+      <a class="btn btn--magnes" href="kontakt.html">Umów wizytę</a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu-mobilne" aria-label="Menu">
+        <span class="menu-btn__kreski" aria-hidden="true"><i></i><i></i></span>
+      </button>
+    </div>
+  </div>
+  <!-- Pasek postępu czytania — rysuje go GSAP w ruch.js. -->
+  <div class="masthead__postep" aria-hidden="true"><i></i></div>
+</header>
+
+<!-- Menu na wąskim ekranie. Do tej pory telefon dostawał sam logotyp
+     i przycisk „Umów wizytę" — z galerii nie dało się przejść nigdzie
+     indziej. Panel jest poza #smooth-wrapper, jak cały pasek, więc
+     działa też wtedy, gdy przewijanie jest zablokowane. -->
+<div class="menu-panel" id="menu-mobilne" hidden>
+  <nav class="menu-panel__spis" aria-label="Menu główne">
+      <a href="index.html"><span class="menu-panel__nr">01</span><span>O nas</span></a>
+      <a href="oferta.html"><span class="menu-panel__nr">02</span><span>Oferta</span></a>
+      <a href="cennik.html"><span class="menu-panel__nr">03</span><span>Cennik</span></a>
+      <a href="zespol.html"><span class="menu-panel__nr">04</span><span>Zespół</span></a>
+      <a href="galeria.html"><span class="menu-panel__nr">05</span><span>Galeria</span></a>
+      <a href="opinie.html"><span class="menu-panel__nr">06</span><span>Opinie</span></a>
+      <a href="dobre-rady.html" aria-current="page"><span class="menu-panel__nr">07</span><span>Dobre rady</span></a>
+      <a href="kontakt.html"><span class="menu-panel__nr">08</span><span>Kontakt</span></a>
+      <a href="logowanie.html"><span class="menu-panel__nr">09</span><span>Moje konto</span></a>
+  </nav>
+  <div class="menu-panel__stopka">
+    <a href="tel:+48413431671">41 343 16 71</a>
+    <p>25-366 Kielce, Śniadeckich 7</p>
+  </div>
+</div>
+
+
+<!-- Pasek akcji na telefonie. Numer w pasku nawigacji jest poniżej 62rem
+     ukryty, więc bez tego na telefonie nie ma skąd zadzwonić jednym
+     kliknięciem — a to jest główna droga rezerwacji w gabinecie. -->
+<div class="pasek-akcji" aria-label="Szybki kontakt">
+  <a class="pasek-akcji__poz" href="tel:+48413431671">
+    <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M4.5 3h3l1.5 3.5-2 1.4a10.5 10.5 0 0 0 5.1 5.1l1.4-2L17 12.5v3a1.5 1.5 0 0 1-1.6 1.5A13.5 13.5 0 0 1 3 4.6 1.5 1.5 0 0 1 4.5 3Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    <span>Zadzwoń</span>
+  </a>
+  <a class="pasek-akcji__poz" href="https://www.google.com/maps/place/Dental+Park+-+przychodnia+stomatologiczna/@50.8663699,20.6342954,17z" target="_blank" rel="noopener">
+    <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M10 17.5S4 12.4 4 8.4a6 6 0 1 1 12 0c0 4-6 9.1-6 9.1Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="10" cy="8.2" r="2.1" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+    <span>Dojazd</span>
+  </a>
+  <a class="pasek-akcji__poz pasek-akcji__poz--glowna" href="kontakt.html">
+    <span>Umów wizytę</span>
+  </a>
+</div>
+
+<div id="smooth-wrapper">
+<div id="smooth-content">
+
+<main id="main">
+
+<section class="section section--tight usluga-pas">
+  <div class="wrap">
+    <nav class="crumb" aria-label="Ścieżka nawigacji">
+      <ol><li><a href="index.html">Strona główna</a></li><li><a href="logowanie.html">Moje konto</a></li><li><span aria-current="page">Umów wizytę</span></li></ol>
+    </nav>
+    <h1 style="margin-top:1.25rem;max-width:22ch" data-rozbij="linie">Umów wizytę</h1>
+    <p class="lead" style="max-width:56ch">Wybierz dzień i godzinę, podaj kontakt i zabieg. Termin rezerwujemy na stałe po wpłacie 20 zł, którą oddajemy.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-top:calc(var(--section) * 0.5)" data-rezerwacja>
+  <div class="wrap">
+    <div class="konto-uwaga">
+      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><path d="M10 2.5 18 17H2L10 2.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 8v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="14.4" r="0.9" fill="currentColor"/></svg>
+      <p><b>Wersja pokazowa.</b> Rezerwacja przez stronę jeszcze nie działa — poniżej widać, jak będzie wygladać. Terminy są przykładowe, nic nie jest zapisywane i <b>żadna opłata nie jest pobierana</b>. Wizytę umówisz telefonicznie pod numerem <a href="tel:+48413431671">41 343 16 71</a>.</p>
+    </div>
+
+    <noscript>
+      <p class="konto-pod" style="max-width:60ch">Kalendarz terminów wymaga włączonego JavaScriptu. Bez niego wizytę umówisz telefonicznie: <a href="tel:+48413431671">41 343 16 71</a>, pon.–pt. 9:00–19:00, sob. 9:00–15:00.</p>
+    </noscript>
+
+    <ol class="kroki">
+      <li data-stan="teraz"><b>1</b> Termin</li>
+      <li data-stan="przed"><b>2</b> Dane</li>
+      <li data-stan="przed"><b>3</b> Opłata</li>
+    </ol>
+
+    <form action="#" method="post">
+
+      <!-- ===== KROK 1: TERMIN ===== -->
+      <div class="krok" id="krok-termin">
+        <div class="rezerwacja">
+
+          <div class="kalendarz">
+            <div class="kalendarz__pasek">
+              <button class="kalendarz__strzalka" type="button" data-miesiac-krok="-1" aria-label="Poprzedni miesiąc">
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M10 3 L5 8 L10 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <p class="kalendarz__miesiac" data-miesiac aria-live="polite">&nbsp;</p>
+              <button class="kalendarz__strzalka" type="button" data-miesiac-krok="1" aria-label="Następny miesiąc">
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false"><path d="M6 3 L11 8 L6 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            <div class="kalendarz__naglowki" aria-hidden="true">
+              <span>pn</span><span>wt</span><span>śr</span><span>cz</span><span>pt</span><span>sb</span><span>nd</span>
+            </div>
+            <div class="kalendarz__siatka" data-siatka role="group" aria-label="Dni miesiąca"></div>
+          </div>
+
+          <div class="godziny-panel">
+            <h3 data-godziny-naglowek>Wybierz dzień</h3>
+            <p data-godziny-opis>Godziny pokażą się po kliknięciu w kalendarz.</p>
+            <ul class="godziny" data-godziny></ul>
+          </div>
+
+        </div>
+
+        <ul class="legenda">
+          <li><i></i> wolne</li>
+          <li><i class="czeka"></i> zajęte, czeka na potwierdzenie</li>
+          <li><i class="zajete"></i> zarezerwowane</li>
+        </ul>
+
+        <p class="konto-pod" data-wybrany-termin aria-live="polite">Nie wybrano jeszcze terminu.</p>
+
+        <div class="krok__nawigacja">
+          <button class="btn btn--magnes" type="button" data-dalej="1" disabled>Dalej — dane kontaktowe</button>
+        </div>
+      </div>
+
+      <!-- ===== KROK 2: DANE ===== -->
+      <div class="krok" id="krok-dane" hidden>
+        <div class="formularz konto-karta" style="max-width:34rem">
+          <h2>Twoje dane</h2>
+          <p>Zadzwonimy dzień przed wizytą, żeby ją potwierdzić.</p>
+
+          <div class="field">
+            <label for="z-imie">Imię i nazwisko <span class="req">*</span></label>
+            <input id="z-imie" name="imieinazwisko" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="z-tel">Telefon <span class="req">*</span></label>
+            <input id="z-tel" name="telefon" type="tel" autocomplete="tel" placeholder="600 000 000" required>
+          </div>
+          <div class="field">
+            <label for="z-mail">Adres e-mail <span class="req">*</span></label>
+            <input id="z-mail" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="z-zabieg">Zabieg <span class="req">*</span></label>
+            <select id="z-zabieg" name="zabieg" required>
+          <option>Przegląd i plan leczenia</option>
+          <option>Leczenie zębów (stomatologia zachowawcza)</option>
+          <option>Higienizacja — skaling i piaskowanie</option>
+          <option>Stomatologia estetyczna</option>
+          <option>Implanty</option>
+          <option>Protetyka</option>
+          <option>Chirurgia stomatologiczna</option>
+          <option>Leczenie kanałowe pod mikroskopem</option>
+          <option>Leczenie w narkozie</option>
+          <option>Nie wiem — proszę o pomoc w doborze</option>
+            </select>
+          </div>
+          <p class="pole-wskazowka">Jeśli nie wiesz, co wybrać, zostaw ostatnią pozycję — lekarz ustali to na przeglądzie.</p>
+
+          <div class="zgoda">
+            <input id="z-zgoda" name="zgoda" type="checkbox" required>
+            <label for="z-zgoda">Zgadzam się na kontakt telefoniczny i e-mailowy w sprawie tej wizyty oraz zapoznałem się z <a href="polityka-prywatnosci.html">polityką prywatności</a>.</label>
+          </div>
+        </div>
+
+        <div class="krok__nawigacja">
+          <button class="btn btn--obrys" type="button" data-wstecz="0">Wróć do terminu</button>
+          <button class="btn btn--magnes" type="button" data-dalej="2">Dalej — opłata</button>
+        </div>
+      </div>
+
+      <!-- ===== KROK 3: OPŁATA ===== -->
+      <div class="krok" id="krok-oplata" hidden>
+        <h2>Sprawdź i potwierdź</h2>
+
+        <dl class="podsumowanie">
+          <dt>Termin</dt><dd><b data-pole="termin"></b></dd>
+          <dt>Zabieg</dt><dd data-pole="zabieg"></dd>
+          <dt>Pacjent</dt><dd data-pole="imie"></dd>
+          <dt>Telefon</dt><dd data-pole="telefon"></dd>
+          <dt>E-mail</dt><dd data-pole="mail"></dd>
+          <dt>Gabinet</dt><dd>ul. Jana i Jędrzeja Śniadeckich 7, 25-366 Kielce</dd>
+        </dl>
+
+        <div class="oplata">
+          <p class="oplata__kwota">20 zł</p>
+          <p>Opłata rezerwacyjna. Nie jest kosztem wizyty — wraca do Ciebie w całości.</p>
+          <ul>
+            <li data-blisko hidden><b>Ten termin jest bliżej niż doba</b> — opłata przepada, jeśli wizyta się nie odbędzie. Zwrot przysługuje przy odwołaniu najpóźniej 24 godziny przed, a tego czasu już nie ma.</li>
+            <li><b>Odwołanie do <span data-pole="granica"></span></b> — pełny zwrot na konto, bez pytań. To doba przed wizytą.</li>
+            <li><b>Po odbytej wizycie</b> — kwota wraca na saldo Twojego konta albo odliczamy ją od rachunku w recepcji. Wybierasz na miejscu.</li>
+            <li><b>Gdy nie potwierdzisz wizyty w systemie</b> — termin się zwalnia, a opłata wraca automatycznie.</li>
+            <li><b>Gdy wizytę odwoła gabinet</b> — opłata wraca automatycznie, niezależnie od tego, ile zostało do terminu.</li>
+            <li><b>Odwołanie później niż na dobę przed</b> — opłata przepada. To ona sprawia, że zwolniona godzina trafia do kogoś, kto czeka.</li>
+          </ul>
+        </div>
+
+        <p class="konto-pod" style="max-width:60ch">Po uruchomieniu systemu w tym miejscu pojawi się przelew do operatora płatności. W wersji pokazowej nie zbieramy żadnych danych karty ani nie pobieramy pieniędzy.</p>
+
+        <div class="krok__nawigacja">
+          <button class="btn btn--obrys" type="button" data-wstecz="1">Wróć do danych</button>
+          <a class="btn btn--magnes" href="tel:+48413431671">Umów telefonicznie: 41 343 16 71</a>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__grid">
+      <div>
+        <a class="logo" href="index.html">dental<span>park</span></a>
+        <address class="stopka-nap">
+          ul. Jana i Jędrzeja Śniadeckich 7<br>
+          25-366 Kielce<br>
+          tel.: <a href="tel:+48413431671">41 343 16 71</a><br>
+          <a href="mailto:gabinet@dentalpark.kie.pl">gabinet@dentalpark.kie.pl</a>
+        </address>
+        <p class="stopka-godziny">
+          <b>Godziny otwarcia</b>
+          pon.–pt. 9:00–19:00<br>sob. 9:00–15:00<br>niedziela zamknięte
+        </p>
+      </div>
+      <div>
+        <h3>Serwis</h3>
+        <ul><li><a href="oferta.html"><span>Oferta</span></a></li><li><a href="cennik.html"><span>Cennik</span></a></li><li><a href="zespol.html"><span>Zespół</span></a></li><li><a href="galeria.html"><span>Galeria</span></a></li><li><a href="opinie.html"><span>Opinie</span></a></li><li><a href="dobre-rady.html"><span>Dobre rady</span></a></li><li><a href="kontakt.html"><span>Kontakt</span></a></li><li><a href="logowanie.html"><span>Moje konto</span></a></li><li><a href="rezerwacja.html"><span>Umów wizytę</span></a></li></ul>
+      </div>
+      <div>
+        <h3>Oferta</h3>
+        <ul><li><a href="stomatologia-estetyczna.html"><span>Stomatologia estetyczna</span></a></li><li><a href="implanty.html"><span>Implanty</span></a></li><li><a href="protetyka.html"><span>Protetyka</span></a></li><li><a href="chirurgia.html"><span>Chirurgia stomatologiczna</span></a></li><li><a href="leczenie-kanalowe.html"><span>Leczenie kanałowe</span></a></li><li><a href="narkoza.html"><span>Leczenie w narkozie</span></a></li></ul>
+      </div>
+    </div>
+    <div class="footer__legal">© 2026 Dental Park — przychodnia stomatologiczna, ul. Jana i Jędrzeja Śniadeckich 7, 25-366 Kielce<br>NIP 657-19-22-500 · REGON 290854728 · <a href="polityka-prywatnosci.html">Polityka prywatności</a></div>
+  </div>
+</footer>
+
+</div><!-- /#smooth-content -->
+</div><!-- /#smooth-wrapper -->
+<!-- usluga.js pierwszy: buduje indeks i klasy wierszy, które
+     ruch.js dopiero potem animuje. -->
+<script src="usluga.js"></script>
+<!-- GSAP: rdzeń + wtyczki użyte na stronie. Jeden zestaw na wszystkich
+     podstronach — ruch.js rejestruje tylko to, co się faktycznie wczytało. -->
+<script src="vendor/gsap/gsap.min.js"></script>
+<script src="vendor/gsap/ScrollTrigger.min.js"></script>
+<script src="vendor/gsap/ScrollSmoother.min.js"></script>
+<script src="vendor/gsap/ScrollToPlugin.min.js"></script>
+<script src="vendor/gsap/Observer.min.js"></script>
+<script src="vendor/gsap/SplitText.min.js"></script>
+<script src="vendor/gsap/DrawSVGPlugin.min.js"></script>
+<script src="vendor/gsap/MotionPathPlugin.min.js"></script>
+<script src="vendor/gsap/ScrambleTextPlugin.min.js"></script>
+<script src="vendor/gsap/CustomEase.min.js"></script>
+<script src="vendor/gsap/CustomWiggle.min.js"></script>
+<script src="vendor/gsap/Flip.min.js"></script>
+<script src="vendor/gsap/Draggable.min.js"></script>
+<script src="vendor/gsap/InertiaPlugin.min.js"></script>
+<script src="ruch.js"></script>
+<script src="rezerwacja.js" defer></script>
+<script src="analityka.js" defer></script>
+</body>
+</html>

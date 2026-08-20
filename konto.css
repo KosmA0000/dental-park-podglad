@@ -1,0 +1,445 @@
+/* ============================================================
+   KONTO PACJENTA
+   Wersja pokazowa: strony wyglądają i zachowują się jak gotowy
+   panel, ale nie ma za nimi serwera ani bazy. Nic nie jest
+   wysyłane i nic nie jest zapisywane — patrz pasek `.konto-uwaga`,
+   który mówi to samo pacjentowi, zanim cokolwiek wpisze.
+   ============================================================ */
+
+/* ---------- pasek „to jeszcze nie działa" ----------
+   Stoi NAD formularzem, nie pod nim. Ostrzeżenie pod polem hasła
+   przychodzi za późno — czyta się je już po wpisaniu. */
+.konto-uwaga {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  max-width: 62ch;
+  margin: 0 0 2.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--brass);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--mist) 28%, var(--paper));
+}
+.konto-uwaga svg { flex: none; margin-top: 0.15rem; color: var(--brass); }
+.konto-uwaga p { margin: 0; font-size: var(--step-small); color: var(--moss); }
+.konto-uwaga b { color: var(--deep); }
+
+/* ---------- logowanie i zakładanie konta ----------
+   Dwie karty obok siebie, nie zakładki. Zakładki chowają jedną
+   z dwóch dróg za kliknięciem, a pacjent, który jeszcze nie ma
+   konta, musi tę drugą najpierw znaleźć. */
+.konto-siatka {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (min-width: 56rem) {
+  .konto-siatka { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+.konto-karta h2 { margin: 0 0 0.4rem; }
+.konto-karta > p:first-of-type {
+  margin: 0 0 1.75rem;
+  font-size: var(--step-small);
+  color: var(--moss);
+}
+.konto-karta .btn { width: 100%; justify-content: center; }
+
+/* Hasło i podpowiedź pod nim. */
+.pole-haslo { position: relative; }
+.pole-haslo input { padding-right: 5.5rem; }
+.pokaz-haslo {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.4rem;
+  min-height: 40px;
+  padding: 0 0.75rem;
+  border: 0;
+  background: none;
+  color: var(--moss);
+  font: inherit;
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.pokaz-haslo:hover { color: var(--deep); }
+.pole-wskazowka {
+  margin: -1rem 0 1.5rem;
+  font-size: var(--step-eyebrow);
+  color: var(--moss);
+}
+
+/* Zgoda: pole wyboru obok tekstu, nie pod nim. */
+.zgoda {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+}
+.zgoda input { width: 1.15rem; height: 1.15rem; margin-top: 0.2rem; accent-color: var(--deep); }
+.zgoda label { font-size: var(--step-eyebrow); line-height: 1.5; color: var(--moss); }
+
+.konto-pod {
+  margin: 1.25rem 0 0;
+  font-size: var(--step-eyebrow);
+  color: var(--moss);
+}
+
+/* ---------- najbliższa wizyta ----------
+   Jedna rzecz, po którą pacjent tu wchodzi, więc dostaje odwrócone
+   kolory i pierwsze miejsce. Reszta panelu jest pod nią. */
+.wizyta-blisko {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: 1.5rem;
+  background: var(--deep);
+  color: var(--paper);
+}
+@media (min-width: 48rem) {
+  .wizyta-blisko { grid-template-columns: auto 1fr auto; align-items: center; gap: 2rem; }
+}
+.wizyta-blisko__kiedy { display: grid; gap: 0.1rem; }
+.wizyta-blisko__dzien {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 7vw, 4.25rem);
+  line-height: 0.95;
+  font-variant-numeric: tabular-nums;
+}
+.wizyta-blisko__miesiac {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--haze);
+}
+.wizyta-blisko__co { display: grid; gap: 0.3rem; }
+.wizyta-blisko__co b { font-size: var(--step-h3); font-weight: 500; }
+.wizyta-blisko__co span { font-size: var(--step-small); color: var(--haze); }
+.wizyta-blisko .btn--light { white-space: nowrap; }
+
+/* ---------- zaplanowane wizyty ---------- */
+.wizyty { display: grid; gap: 1rem; margin: 0; padding: 0; list-style: none; }
+.wizyta {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--paper);
+}
+@media (min-width: 44rem) {
+  .wizyta { grid-template-columns: 9rem 1fr auto; align-items: center; gap: 1.5rem; }
+}
+.wizyta__data {
+  font-size: var(--step-small);
+  font-variant-numeric: tabular-nums;
+  color: var(--deep);
+}
+.wizyta__data b { display: block; font-weight: 500; }
+.wizyta__data span { color: var(--moss); }
+.wizyta__co { display: grid; gap: 0.2rem; }
+.wizyta__co b { font-weight: 500; color: var(--deep); }
+.wizyta__co span { font-size: var(--step-small); color: var(--moss); }
+.wizyta__akcje { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* ---------- historia leczenia ----------
+   Tabela, bo to dane w kolumnach i tak je czyta zarówno oko, jak
+   i czytnik ekranu. Na telefonie ta sama tabela rozkłada się na
+   kafelki: cztery kolumny na 390 px daja slupki po dwa znaki. */
+.historia { width: 100%; border-collapse: collapse; }
+.historia caption { text-align: left; margin-bottom: 1rem; color: var(--moss); font-size: var(--step-small); }
+.historia th {
+  text-align: left;
+  padding: 0 1rem 0.75rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--step-eyebrow);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.historia td {
+  padding: 1rem 1rem 1rem 0;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--step-small);
+  color: var(--deep);
+  vertical-align: top;
+}
+.historia td:first-child { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.historia td:last-child { color: var(--moss); }
+@media (max-width: 43.99rem) {
+  .historia, .historia tbody, .historia tr, .historia td { display: block; }
+  .historia thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .historia tr {
+    margin-bottom: 1rem;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: 1.25rem;
+    background: var(--paper);
+  }
+  .historia td { padding: 0.35rem 0; border: 0; }
+  .historia td::before {
+    display: block;
+    content: attr(data-kol);
+    font-size: var(--step-eyebrow);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brass);
+  }
+}
+
+/* ---------- dane pacjenta ---------- */
+.dane { display: grid; gap: 0.85rem; margin: 0; }
+@media (min-width: 40rem) {
+  .dane { grid-template-columns: auto 1fr; gap: 0.85rem 2rem; }
+}
+.dane dt {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.dane dd { margin: 0; color: var(--deep); }
+
+/* ---------- powitanie i wylogowanie ---------- */
+.panel-gora {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+/* ============================================================
+   REZERWACJA WIZYTY
+   ============================================================ */
+
+/* ---------- kroki ----------
+   Trzy kroki widoczne od początku, bo pacjent musi wiedzieć, ile go
+   czeka, zanim zacznie. Ukryty koniec drogi to najczęstszy powód
+   porzucenia formularza w połowie. */
+.kroki {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.75rem;
+  margin: 0 0 2.5rem;
+  padding: 0;
+  list-style: none;
+}
+.kroki li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--moss);
+}
+.kroki li b {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.kroki li[data-stan="teraz"] { color: var(--deep); }
+.kroki li[data-stan="teraz"] b { border-color: var(--deep); background: var(--deep); color: var(--paper); }
+.kroki li[data-stan="zrobione"] b { border-color: var(--deep); color: var(--deep); }
+
+.krok[hidden] { display: none; }
+
+/* ---------- kalendarz i godziny obok siebie ---------- */
+.rezerwacja { display: grid; gap: 1.5rem; align-items: start; }
+@media (min-width: 60rem) {
+  .rezerwacja { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 2rem; }
+}
+
+.kalendarz, .godziny-panel {
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--paper);
+}
+
+.kalendarz__pasek {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.kalendarz__miesiac {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  color: var(--deep);
+}
+.kalendarz__strzalka {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: none;
+  color: var(--deep);
+  cursor: pointer;
+  transition: background-color .3s ease, border-color .3s ease;
+}
+.kalendarz__strzalka:hover:not(:disabled) { background: var(--deep); border-color: var(--deep); color: var(--paper); }
+.kalendarz__strzalka:disabled { opacity: 0.3; cursor: default; }
+
+.kalendarz__naglowki, .kalendarz__siatka {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+}
+.kalendarz__naglowki {
+  margin-bottom: 0.5rem;
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--moss);
+  text-align: center;
+}
+
+/* Kafelek dnia. Stan niesie i kolor, i podpis — sam kolor odpada,
+   bo co dwunasty mężczyzna nie odróżnia zieleni od czerwieni. */
+.dzien {
+  display: grid;
+  place-items: center;
+  gap: 0.1rem;
+  min-height: 3rem;
+  padding: 0.35rem 0.2rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  background: var(--paper);
+  color: var(--deep);
+  font: inherit;
+  font-size: var(--step-small);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: border-color .25s ease, background-color .25s ease, color .25s ease;
+}
+.dzien:hover:not(:disabled) { border-color: var(--deep); }
+.dzien__stan { font-size: 0.625rem; letter-spacing: 0.04em; color: var(--moss); }
+.dzien--pusty { border: 0; background: none; cursor: default; }
+.dzien:disabled { color: color-mix(in srgb, var(--moss) 45%, transparent); cursor: default; }
+.dzien:disabled .dzien__stan { color: color-mix(in srgb, var(--moss) 45%, transparent); }
+
+/* Zajęte, ale jeszcze niepotwierdzone: termin trzymany, dopóki pacjent
+   nie potwierdzi. Piaskowy, czyli stan przejściowy — ani wolne, ani nasze. */
+.dzien--czeka { background: color-mix(in srgb, var(--mist) 45%, var(--paper)); border-color: var(--mist); }
+.dzien--czeka .dzien__stan { color: var(--brass); }
+
+/* Zarezerwowane na dobre. */
+.dzien--zajety { background: var(--deep); border-color: var(--deep); color: var(--paper); cursor: default; }
+.dzien--zajety .dzien__stan { color: var(--haze); }
+
+.dzien--wybrany { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+/* ---------- godziny ---------- */
+.godziny-panel h3 { margin: 0 0 0.35rem; }
+.godziny-panel > p { margin: 0 0 1.25rem; font-size: var(--step-small); color: var(--moss); }
+.godziny {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.godzina {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.6rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  background: var(--paper);
+  color: var(--deep);
+  font: inherit;
+  font-size: var(--step-small);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .25s ease, background-color .25s ease, color .25s ease;
+}
+.godzina:hover:not(:disabled) { border-color: var(--deep); }
+.godzina__stan { font-size: 0.625rem; color: var(--moss); }
+.godzina--czeka { background: color-mix(in srgb, var(--mist) 45%, var(--paper)); border-color: var(--mist); cursor: default; }
+.godzina--czeka .godzina__stan { color: var(--brass); }
+.godzina--zajeta { background: var(--deep); border-color: var(--deep); color: var(--paper); cursor: default; }
+.godzina--zajeta .godzina__stan { color: var(--haze); }
+.godzina--wybrana { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+/* ---------- legenda ---------- */
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.75rem;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--step-eyebrow);
+  color: var(--moss);
+}
+.legenda li { display: flex; gap: 0.6rem; align-items: center; }
+.legenda i {
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  background: var(--paper);
+}
+.legenda i.czeka { background: color-mix(in srgb, var(--mist) 45%, var(--paper)); border-color: var(--mist); }
+.legenda i.zajete { background: var(--deep); border-color: var(--deep); }
+
+/* ---------- podsumowanie i opłata ---------- */
+.podsumowanie {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0 0 2rem;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, var(--cream) 55%, var(--paper));
+}
+@media (min-width: 40rem) {
+  .podsumowanie { grid-template-columns: auto 1fr; gap: 0.85rem 2rem; }
+}
+.podsumowanie dt {
+  font-size: var(--step-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.podsumowanie dd { margin: 0; color: var(--deep); }
+.podsumowanie dd b { font-weight: 500; }
+
+.oplata {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.25rem, 2.5vw, 1.75rem);
+  border-radius: 1.25rem;
+  background: var(--deep);
+  color: var(--paper);
+}
+.oplata__kwota {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  line-height: 1;
+}
+.oplata p { margin: 0; font-size: var(--step-small); color: var(--haze); }
+.oplata ul { margin: 0; padding-left: 1.1rem; font-size: var(--step-small); color: var(--haze); }
+.oplata li + li { margin-top: 0.5rem; }
+.oplata b { color: var(--paper); font-weight: 500; }
+
+.krok__nawigacja {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
