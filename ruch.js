@@ -347,6 +347,18 @@
           let widziany = false;
           try { widziany = sessionStorage.getItem(OBEJRZANY) === "tak"; } catch (e) { widziany = false; }
 
+          /* Przeladowanie to nie powrot z podstrony, tylko prosba o pokazanie
+             strony jeszcze raz — i film jest tego czescia. Zapis kasujemy
+             tylko przy `reload`; klikniecie w menu (`navigate`) i przycisk
+             wstecz (`back_forward`) nadal omijaja film, bo to ta sama wizyta. */
+          try {
+            const wejscie = performance.getEntriesByType("navigation")[0];
+            if (wejscie && wejscie.type === "reload") {
+              sessionStorage.removeItem(OBEJRZANY);
+              widziany = false;
+            }
+          } catch (e) { /* stara przegladarka bez Navigation Timing 2 */ }
+
           if (widziany) {
             /* Film nie leci drugi raz w tej samej sesji — ale hero zostaje
                OBRAZEM. Wcześniej stawało na ostatniej klatce, a ostatnia
