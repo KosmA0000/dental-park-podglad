@@ -226,7 +226,7 @@
           const koniecFilmu = () => {
             if (!filmSzedl) return;
             filmSzedl = false;
-            try { sessionStorage.setItem("dentalpark-film", "tak"); } catch (e) { /* tryb prywatny */ }
+            try { sessionStorage.setItem("dentalpark-film", String(Date.now())); } catch (e) { /* tryb prywatny */ }
             gsap.ticker.remove(tykaj);
             html.classList.remove("film-gra");
             if (blokada) { blokada.kill(); blokada = null; }
@@ -343,21 +343,23 @@
              pokazuje od razu ostatnią klatkę — płaską zieleń z tekstem —
              i nie blokuje przewijania. Pamięć sesji, nie ciasteczko: nowa
              wizyta następnego dnia znów dostaje film. */
+          /* Zapis ma termin waznosci, bo telefon nie zamyka kart. Na
+             komputerze pamiec sesji ginie razem z zakladka i „jedna wizyta”
+             znaczy to, co powinna. Na telefonie ta sama zakladka potrafi
+             zyc tygodniami — bez terminu pacjent, ktory wrocil po miesiacu,
+             nie zobaczylby filmu nigdy wiecej. Pol godziny: przejscie
+             miedzy podstronami to wciaz ta sama wizyta, powrot nazajutrz
+             juz nie. */
           const OBEJRZANY = "dentalpark-film";
+          const WAZNOSC = 30 * 60 * 1000;
           let widziany = false;
-          try { widziany = sessionStorage.getItem(OBEJRZANY) === "tak"; } catch (e) { widziany = false; }
-
-          /* Przeladowanie to nie powrot z podstrony, tylko prosba o pokazanie
-             strony jeszcze raz — i film jest tego czescia. Zapis kasujemy
-             tylko przy `reload`; klikniecie w menu (`navigate`) i przycisk
-             wstecz (`back_forward`) nadal omijaja film, bo to ta sama wizyta. */
           try {
-            const wejscie = performance.getEntriesByType("navigation")[0];
-            if (wejscie && wejscie.type === "reload") {
-              sessionStorage.removeItem(OBEJRZANY);
-              widziany = false;
-            }
-          } catch (e) { /* stara przegladarka bez Navigation Timing 2 */ }
+            const kiedy = Number(sessionStorage.getItem(OBEJRZANY));
+            widziany = kiedy > 0 && Date.now() - kiedy < WAZNOSC;
+            /* Zapis odswieza sie przy kazdym wejsciu na strone glowna, wiec
+               termin liczy sie od ostatniego ruchu, nie od samego filmu. */
+            if (widziany) sessionStorage.setItem(OBEJRZANY, String(Date.now()));
+          } catch (e) { widziany = false; }
 
           if (widziany) {
             /* Film nie leci drugi raz w tej samej sesji — ale hero zostaje
@@ -1513,10 +1515,17 @@
     const opisKto = opis.querySelector("b");
     const opisCzas = opis.querySelector("span");
 
+    /* Palec nie ma „najechania”. `pointerenter` odpala się dopiero przy
+       dotknięciu, a `pointerleave` — przy dotknięciu czegokolwiek innego,
+       więc na telefonie podpowiedź migala i znikala w pół gestu. Na ekranie
+       dotykowym dyżur otwiera się więc kliknięciem i tak samo zamyka. */
+    const dotyk = matchMedia("(hover: none), (pointer: coarse)").matches;
+    let otwarty = null;
+
     bloki.forEach((blok) => {
       const pelne = (blok.querySelector(".grafik__vh") || {}).textContent || "";
       const [kto, czas] = pelne.split(",");
-      blok.addEventListener("pointerenter", () => {
+      const pokaz = () => {
         podglad = blok.dataset.l;
         rysuj();
         opisKto.textContent = (kto || "").trim();
@@ -1540,13 +1549,37 @@
         const y = r.top - g.top - 8;
         gsap.set(opis, { x, y: y + 6, xPercent: -50, yPercent: -100 });
         gsap.to(opis, { autoAlpha: 1, y, duration: 0.3, overwrite: true });
-      });
-      blok.addEventListener("pointerleave", () => {
+      };
+      const schowaj = () => {
+        podglad = null;
+        rysuj();
+        gsap.to(opis, { autoAlpha: 0, duration: 0.25, overwrite: true });
+      };
+
+      if (dotyk) {
+        blok.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (otwarty === blok) { otwarty = null; schowaj(); return; }
+          otwarty = blok;
+          pokaz();
+        });
+      } else {
+        blok.addEventListener("pointerenter", pokaz);
+        blok.addEventListener("pointerleave", schowaj);
+      }
+    });
+
+    /* Dotknięcie poza dyżurem zamyka podpowiedź — inaczej zostawałaby na
+       ekranie aż do trafienia palcem w kolejną pigułkę. */
+    if (dotyk) {
+      document.addEventListener("click", (e) => {
+        if (!otwarty || e.target.closest(".grafik__blok")) return;
+        otwarty = null;
         podglad = null;
         rysuj();
         gsap.to(opis, { autoAlpha: 0, duration: 0.25, overwrite: true });
       });
-    });
+    }
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && wybor) { wybor = null; podglad = null; rysuj(); }
