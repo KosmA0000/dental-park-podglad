@@ -1772,3 +1772,46 @@ body:has(.karuzela--z-panelem) .lekarze > .lekarz--widoczny { display: block; }
   white-space: nowrap;
   pointer-events: none;
 }
+
+/* ---------- konto w pasku ----------
+   Wejście do panelu jest narzędziem, nie pozycją spisu treści: obok
+   „Umów wizytę", z ikoną, żeby dało się je znaleźć wzrokiem bez
+   czytania całego paska. Poniżej 62rem pasek i tak zwija się do menu,
+   ale konto zostaje — na telefonie to jedyna droga do wizyt, bo tam
+   nikt nie rozwija menu, żeby sprawdzić godzinę wizyty. */
+.masthead__konto {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid currentColor;
+  border-radius: 100px;
+  color: currentColor;
+  font-size: var(--step-small);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color .35s ease, color .35s ease;
+}
+.masthead__konto:hover { background: var(--deep); border-color: var(--deep); color: var(--paper); }
+.masthead__konto[aria-current="page"] { background: var(--deep); border-color: var(--deep); color: var(--paper); }
+
+/* W pasku zostaje sama ikona. Podpis obok niej dokladal 98 px i pasek
+   zawijal sie na dwa wiersze — rosl z 85 do 109 px, dokladnie ta sama
+   usterka, ktora wczesniej kazala schowac numer telefonu. Napis „Moje
+   konto" nie znika: czyta go czytnik ekranu i widac go w menu na
+   telefonie. */
+.masthead__konto { padding: 0.4rem; border-radius: 50%; }
+
+/* Ikona zabrala pasowi 57 px i „Umow wizyte" zlamalo sie na dwa wiersze,
+   przez co przycisk urosl z 53 do 77 px, a caly pasek z 85 do 109.
+   Napis w przycisku akcji nie ma powodu sie lamac — to dwa slowa. */
+.masthead__aside .btn { white-space: nowrap; }
+.masthead__konto span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}

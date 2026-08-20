@@ -53,10 +53,10 @@
       <a href="galeria.html"><span>Galeria</span></a>
       <a href="dobre-rady.html"><span>Dobre rady</span></a>
       <a href="kontakt.html"><span>Kontakt</span></a>
-      <a href="logowanie.html" aria-current="page"><span>Moje konto</span></a>
     </nav>
     <div class="masthead__aside">
       <a class="masthead__tel" href="tel:+48413431671">41 343 16 71</a>
+      <a class="masthead__konto" href="logowanie.html" aria-current="page"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="10" cy="6.9" r="3.1" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3.8 17c.6-3.2 3.1-5 6.2-5s5.6 1.8 6.2 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>Moje konto</span></a>
       <a class="btn btn--magnes" href="kontakt.html">Umów wizytę</a>
       <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu-mobilne" aria-label="Menu">
         <span class="menu-btn__kreski" aria-hidden="true"><i></i><i></i></span>
@@ -135,13 +135,16 @@
            nie dołącza ich do żądania, więc hasło nie trafi do adresu ani do
            logów serwera. W wersji z prawdziwym serwerem `name` wraca, a
            formularz idzie metodą POST po HTTPS. -->
-      <form class="formularz konto-karta" action="panel.html" method="get">
+      <form class="formularz konto-karta" data-logowanie novalidate>
         <h2>Zaloguj się</h2>
         <p>Masz już konto w Dental Park.</p>
 
+        <p class="konto-blad" data-blad hidden role="alert"></p>
+        <p class="konto-juz" data-juz hidden>Jesteś już zalogowany. <a href="panel.html">Przejdź do panelu</a>.</p>
+
         <div class="field">
-          <label for="l-mail">Adres e-mail</label>
-          <input id="l-mail" type="email" autocomplete="username" placeholder="jan.kowalski@example.com" required>
+          <label for="l-login">Login lub adres e-mail</label>
+          <input id="l-login" type="text" autocomplete="username" required>
         </div>
 
         <div class="field pole-haslo">
@@ -149,13 +152,13 @@
           <input id="l-haslo" type="password" autocomplete="off" required>
           <button class="pokaz-haslo" type="button" data-pokaz="l-haslo" aria-label="Pokaż hasło">pokaż</button>
         </div>
-        <p class="pole-wskazowka">To wersja pokazowa — wpisz cokolwiek, żeby zobaczyć panel.</p>
+        <p class="pole-wskazowka">Wersja pokazowa działa na jednym koncie: login <b>KosmaLabuz</b>, hasło <b>cycki</b>. To nie jest zabezpieczenie — za panelem nie ma żadnych danych.</p>
 
         <button class="btn btn--magnes" type="submit">Zaloguj się</button>
         <p class="konto-pod">Nie pamiętasz hasła? Zadzwoń do rejestracji: <a href="tel:+48413431671">41 343 16 71</a>.</p>
       </form>
 
-      <form class="formularz konto-karta" action="panel.html" method="get">
+      <form class="formularz konto-karta" data-rejestracja novalidate>
         <h2>Załóż konto</h2>
         <p>Jesteś u nas pierwszy raz albo leczysz się od lat, ale konta jeszcze nie masz.</p>
 
@@ -268,6 +271,7 @@
 <script src="vendor/gsap/Draggable.min.js"></script>
 <script src="vendor/gsap/InertiaPlugin.min.js"></script>
 <script src="ruch.js"></script>
+<script src="konto.js" defer></script>
 <script src="analityka.js" defer></script>
 </body>
 </html>

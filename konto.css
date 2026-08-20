@@ -443,3 +443,26 @@
   gap: 0.75rem;
   margin-top: 2rem;
 }
+
+/* ---------- komunikaty logowania ----------
+   Błąd stoi nad polami, nie pod przyciskiem: pod przyciskiem bywa poza
+   ekranem na telefonie i nikt go nie widzi, więc wygląda to tak, jakby
+   kliknięcie nic nie zrobiło. */
+.konto-blad, .konto-juz {
+  margin: 0 0 1.5rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 0.75rem;
+  font-size: var(--step-small);
+}
+.konto-blad {
+  border: 1px solid var(--brass);
+  background: color-mix(in srgb, var(--mist) 28%, var(--paper));
+  color: var(--deep);
+}
+.konto-juz {
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--cream) 55%, var(--paper));
+  color: var(--moss);
+}
+.konto-blad[hidden], .konto-juz[hidden] { display: none; }
+.pole-wskazowka b { color: var(--deep); font-weight: 500; }
