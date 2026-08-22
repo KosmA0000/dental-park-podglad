@@ -1,0 +1,282 @@
+/* ============================================================
+   DentalPark — sekcja „O nas" na layoucie z makiety.
+   Sam układ: siatki, kadry, suwaki. Kolory i typografia zostają
+   te, które stoją w styles.css — tu nie ma ani jednej nowej barwy,
+   wszystko idzie przez zmienne z :root.
+   ============================================================ */
+
+/* ---------- 1. Nagłówek strony ----------
+   W makiecie strona zaczyna się od nazwy złożonej przez całą
+   szerokość i jednej linijki podpisu pod nią — bez kolumn, bez
+   zdjęcia obok. Podpis jest rozstrzelony, żeby czytał się jak
+   podtytuł, a nie jak pierwsze zdanie akapitu. */
+.on-tytul { text-align: center; }
+.on-tytul h1 {
+  font-size: var(--step-display);
+  max-width: 22ch;
+  margin-inline: auto;
+}
+.on-tytul__podpis {
+  margin: 1.25rem auto 0;
+  max-width: 46ch;
+  font-size: var(--step-small);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--moss);
+}
+
+/* ---------- 2. Kadr otwierający ----------
+   Jedno zdjęcie na całą szerokość kolumny, zaokrąglone tak samo
+   jak karty niżej — w makiecie to ono trzyma górę strony. */
+.on-kadr {
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--cream);
+}
+.on-kadr img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+@media (max-width: 48rem) {
+  .on-kadr img { aspect-ratio: 4 / 3; }
+}
+
+/* ---------- 3. Suwak: wspólny szkielet ----------
+   Zarówno usługi, jak i galeria stoją w makiecie na jednej
+   mechanice: kilka plansz obok siebie i rząd kropek pod spodem.
+   Bez JS zostaje zwykłe przewijanie w bok — kropki tylko dokładają
+   skok do planszy. */
+.on-tor {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  gap: var(--gutter);
+}
+.on-tor::-webkit-scrollbar { display: none; }
+.on-slajd { scroll-snap-align: start; }
+
+.on-kropki {
+  display: flex;
+  justify-content: center;
+  gap: 0.625rem;
+  margin-top: 2rem;
+}
+.on-kropki button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--line);
+  cursor: pointer;
+}
+.on-kropki button[aria-current="true"] { background: var(--brass); }
+.on-kropki button:focus-visible { outline: 2px solid var(--deep); outline-offset: 3px; }
+
+/* ---------- 4. Usługi ----------
+   Nagłówek na środku, pod nim trzy karty w rzędzie, a środkowa
+   wypełniona — tak jak w makiecie. Po bokach pasa stoją dwa małe
+   kadry, wysunięte poza siatkę kart; są ozdobne, więc na wąskim
+   ekranie znikają, a czytnik ekranu ich nie widzi. */
+.on-uslugi { position: relative; }
+.on-uslugi .section-head { text-align: center; }
+.on-uslugi .section-head p { margin-inline: auto; }
+
+.on-uslugi__siatka {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 48rem) {
+  .on-uslugi__siatka { grid-template-columns: repeat(3, 1fr); }
+}
+
+.on-usluga {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: clamp(1.5rem, 2.5vw, 2rem);
+  border-radius: 14px;
+  /* Karty stoją na --paper (tło strony), więc na --paper byłyby
+     niewidoczne. --cream to ten sam krem, którym strona oddziela pasy;
+     środkowa karta idzie o stopień dalej, na --mist. */
+  background: var(--cream);
+  text-align: center;
+  align-items: center;
+}
+/* Środkowa karta na wypełnieniu — jedyna różnica między kartami
+   w makiecie. Barwa to --mist, ta sama, której strona używa na
+   ciemnym tle; tekst zostaje na --deep, więc kontrast trzyma. */
+.on-usluga--wyrozniona { background: var(--mist); }
+
+.on-usluga__nr {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: var(--step-h3);
+  line-height: 1;
+  color: var(--brass);
+}
+.on-usluga--wyrozniona .on-usluga__nr { border-color: var(--brass); }
+.on-usluga h3 {
+  font-family: var(--font-text);
+  font-size: var(--step-small);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+.on-usluga h3 a { text-decoration: none; }
+.on-usluga p {
+  max-width: 32ch;
+  font-size: var(--step-small);
+  line-height: 1.65;
+  color: var(--moss);
+}
+.on-usluga--wyrozniona p { color: var(--ink); }
+
+.on-uslugi__foto {
+  position: absolute;
+  width: clamp(7rem, 12vw, 10.5rem);
+  border-radius: 12px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.on-uslugi__foto img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+/* Kadry stoją przy krawędzi kolumny tekstu, nie przy krawędzi okna:
+   przyklejone do zera wchodziły w margines strony i ucinały się. */
+.on-uslugi__foto--lewe  { left: clamp(0.5rem, 2vw, 2rem);  top: 46%; }
+.on-uslugi__foto--prawe { right: clamp(0.5rem, 2vw, 2rem); top: 26%; }
+@media (max-width: 78rem) {
+  .on-uslugi__foto { display: none; }
+}
+
+/* ---------- 5. Galeria ----------
+   Pięć kadrów w rzędzie: trzy wysokie i czwarta kolumna złożona
+   z dwóch niższych. Ten sam rysunek co w makiecie, tyle że siatka
+   sama się składa do dwóch kolumn na telefonie. */
+.on-realizacje .section-head { text-align: center; }
+
+.on-mozaika {
+  display: grid;
+  gap: 0.875rem;
+  grid-template-columns: repeat(2, 1fr);
+}
+.on-mozaika__kadr {
+  margin: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--paper);
+}
+/* Poniżej 62rem siatka nie ma zadanej wysokości, więc kadry muszą ją
+   brać z proporcji obrazka. Wysokość 100% zostaje tylko tam, gdzie pas
+   ma sztywną wysokość — inaczej wiersze schodzą do zera. */
+.on-mozaika__kadr img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+@media (min-width: 62rem) {
+  .on-mozaika {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    height: clamp(20rem, 32vw, 26rem);
+  }
+  .on-mozaika__kadr:nth-child(1) { grid-row: 1 / 3; }
+  .on-mozaika__kadr:nth-child(2) { grid-row: 1 / 3; }
+  .on-mozaika__kadr:nth-child(3) { grid-row: 1 / 3; }
+  .on-mozaika__kadr img { height: 100%; aspect-ratio: auto; }
+}
+
+/* ---------- 6. Zespół i kontakt ----------
+   Dół strony w makiecie to dwie kolumny: po lewej ludzie, po prawej
+   wypełniony panel z formularzem. Kolumna z ludźmi jest szersza. */
+.on-dol {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+@media (min-width: 62rem) {
+  .on-dol { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); }
+}
+
+.on-zespol__siatka {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(2, 1fr);
+}
+.on-osoba { text-align: center; }
+.on-osoba__kadr {
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--cream);
+  margin-bottom: 1.25rem;
+}
+.on-osoba__kadr img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+.on-osoba h3 {
+  font-family: var(--font-text);
+  font-size: var(--step-small);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.on-osoba p {
+  margin-top: 0.75rem;
+  font-size: var(--step-small);
+  line-height: 1.65;
+  color: var(--moss);
+}
+
+.on-kontakt {
+  padding: clamp(1.75rem, 3.5vw, 2.75rem);
+  border-radius: 18px;
+  background: var(--mist);
+}
+.on-kontakt h2 { margin-bottom: 1.75rem; }
+/* Panel stoi na --mist, więc pola nie mogą zostać na --paper z ramką
+   --line: wtopiłyby się w tło. Pełne zaokrąglenie i biel pola to
+   dokładnie to, co robi makieta. */
+.on-kontakt .field { margin-bottom: 1rem; }
+.on-kontakt .field label { color: var(--ink); }
+.on-kontakt .field input,
+.on-kontakt .field textarea {
+  background: var(--paper);
+  border: 1px solid var(--paper);
+  border-radius: 10px;
+}
+.on-kontakt .field textarea { min-height: 7rem; }
+.on-kontakt .btn { width: 100%; justify-content: center; }
+.on-kontakt .zgoda__nota { color: var(--ink); }
+
+.on-spoleczne {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+.on-spoleczne a {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  color: var(--deep);
+}
+.on-spoleczne a:hover { background: var(--paper); }
+
+/* Formularz w panelu bocznym zostaje w jednej kolumnie: dwie kolumny
+   z .formularz włączają się od 48rem szerokości okna, a panel jest
+   wtedy węższy niż połowa strony i pola robiły się na dwa słowa. */
+.on-kontakt .formularz { display: block; }
